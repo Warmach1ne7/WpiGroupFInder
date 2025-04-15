@@ -1,4 +1,4 @@
-package com.example.wpigroupfinder
+package com.example.wpigroupfinder.screens.login
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,8 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 
+
 @Composable
-fun HomeScreenDesign(navController: NavController) {
+fun UserScreenDesign(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -19,9 +20,13 @@ fun HomeScreenDesign(navController: NavController) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Centered Column")
-            Button(onClick = { navController.navigate("details") }) {
-                Text("Go to Details")
+            Text("User Account")
+            Button(onClick = { navController.navigate("eventFeed") }) {
+                Text("Back to Event Feed")
+            }
+
+            Button(onClick = { /*navController.navigate("eventFeed") */}) {
+                Text("Register as ClubOwner (Inactive)")
             }
         }
     }
