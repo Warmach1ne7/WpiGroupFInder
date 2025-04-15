@@ -37,6 +37,8 @@ class MainActivity : ComponentActivity() {
         ) {
             composable("home") { HomeScreenDesign(navController) }
             composable("details") { DetailsScreenDesign(navController) }
+            composable("createUser") {CreateUserScreen(navController)}
+            composable("viewUser") { UserProfile(navController) }
         }
     }
 }

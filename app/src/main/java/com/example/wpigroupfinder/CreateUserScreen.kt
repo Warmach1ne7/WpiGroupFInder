@@ -17,23 +17,22 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.RequestBody
 import org.json.JSONObject
 
 @Composable
-fun HomeScreenDesign(navController: NavController) {
+fun CreateUserScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    fun signInRequest(){
+    fun createUserRequest(){
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
 
-            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/signIn"
+            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/createUser"
 
             val jsonMediaType = "application/json; charset=utf-8".toMediaType()
             println(username)
@@ -69,7 +68,7 @@ fun HomeScreenDesign(navController: NavController) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("WPI Group Finder Sign In")
+            Text("Create User")
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
@@ -80,16 +79,12 @@ fun HomeScreenDesign(navController: NavController) {
                 onValueChange = { password = it },
                 label = { Text("Password") }
             )
-            Button(onClick = { signInRequest() }){
-                Text("Login")
+            Button(onClick = { createUserRequest() }){
+                Text("Create User")
             }
-            Button(onClick = { navController.navigate("createUser") }){
-                Text("Sign Up")
-            }
-            Button(onClick = { navController.navigate("viewUser") }){
-                Text("View User")
+            Button(onClick = { navController.navigate("home") }){
+                Text("Sign In")
             }
         }
     }
-
 }

@@ -7,6 +7,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,19 +18,21 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.RequestBody
 import org.json.JSONObject
+import coil.compose.AsyncImage
 
 @Composable
-fun HomeScreenDesign(navController: NavController) {
+fun UserProfile(navController: NavController) {
     var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var profilePic by remember { mutableStateOf("") }
 
-    fun signInRequest(){
+
+    LaunchedEffect("test") {
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
 
@@ -37,11 +40,10 @@ fun HomeScreenDesign(navController: NavController) {
 
             val jsonMediaType = "application/json; charset=utf-8".toMediaType()
             println(username)
-            println(password)
+
             val jsonBody = """
             {
-                "username": "$username",
-                "password": "$password"
+                "username": "testUser"
             }
         """.trimIndent().toRequestBody(jsonMediaType)
 
@@ -53,7 +55,10 @@ fun HomeScreenDesign(navController: NavController) {
             try {
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
+                    val jsonResp = JSONObject(response.body?.string())
                     println("Success: ${JSONObject(response.body?.string())}")
+                    username = jsonResp.getString("username")
+                    description = jsonResp.getString("description")
                 } else {
                     println("Error: ${response.code}")
                 }
@@ -62,6 +67,7 @@ fun HomeScreenDesign(navController: NavController) {
             }
         }
     }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -69,26 +75,14 @@ fun HomeScreenDesign(navController: NavController) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("WPI Group Finder Sign In")
-            OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") }
+            Text("WPI Group Finder User Page")
+            Text("$username")
+            Text("$description")
+            AsyncImage(
+                model = "https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg",
+                contentDescription = "test image"
             )
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") }
-            )
-            Button(onClick = { signInRequest() }){
-                Text("Login")
-            }
-            Button(onClick = { navController.navigate("createUser") }){
-                Text("Sign Up")
-            }
-            Button(onClick = { navController.navigate("viewUser") }){
-                Text("View User")
-            }
+            Text("Clubs go here")
         }
     }
 
