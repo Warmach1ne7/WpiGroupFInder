@@ -66,6 +66,10 @@ class MainActivity : ComponentActivity() {
             }
             composable("viewClubPage") { ViewClubPageScreenDesign(navController) } //will need extra args
             composable("verification") { VerificationScreenDesign(navController) } //will need extra args
+            composable("home") { HomeScreenDesign(navController) }
+            composable("details") { DetailsScreenDesign(navController) }
+            composable("createUser") {CreateUserScreen(navController)}
+            composable("viewUser") { UserProfile(navController) }
         }
     }
 }
