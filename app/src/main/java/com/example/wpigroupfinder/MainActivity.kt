@@ -17,7 +17,7 @@ import com.example.wpigroupfinder.screens.clubowner.EditEventScreenDesign
 import com.example.wpigroupfinder.screens.mainview.EventFeedScreenDesign
 import com.example.wpigroupfinder.screens.login.LoginScreenDesign
 import com.example.wpigroupfinder.screens.mainview.MapScreenDesign
-import com.example.wpigroupfinder.screens.login.RegisterScreenDesign
+import com.example.wpigroupfinder.screens.login.SignupScreenDesign
 import com.example.wpigroupfinder.screens.login.UserScreenDesign
 import com.example.wpigroupfinder.screens.mainview.VerificationScreenDesign
 import com.example.wpigroupfinder.screens.mainview.ViewClubPageScreenDesign
@@ -41,11 +41,11 @@ class MainActivity : ComponentActivity() {
 
         NavHost(
             navController = navController,
-            startDestination = "eventFeed"
+            startDestination = "login"
         ) {
             //login
             composable("login") { LoginScreenDesign(navController) }
-            composable("register") { RegisterScreenDesign(navController) }
+            composable("signup") { SignupScreenDesign(navController) }
             composable("user") { UserScreenDesign(navController) }
 
             //clubOwner
@@ -66,10 +66,6 @@ class MainActivity : ComponentActivity() {
             }
             composable("viewClubPage") { ViewClubPageScreenDesign(navController) } //will need extra args
             composable("verification") { VerificationScreenDesign(navController) } //will need extra args
-            composable("home") { HomeScreenDesign(navController) }
-            composable("details") { DetailsScreenDesign(navController) }
-            composable("createUser") {CreateUserScreen(navController)}
-            composable("viewUser") { UserProfile(navController) }
         }
     }
 }

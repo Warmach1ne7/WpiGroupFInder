@@ -1,4 +1,4 @@
-package com.example.wpigroupfinder
+package com.example.wpigroupfinder.screens.login
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,7 +7,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,27 +22,25 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
-import coil.compose.AsyncImage
 
 @Composable
-fun UserProfile(navController: NavController) {
+fun SignupScreenDesign(navController: NavController) {
     var username by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var profilePic by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
-
-    LaunchedEffect("test") {
+    fun createUserRequest(){
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
 
-            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/signIn"
+            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/createUser"
 
             val jsonMediaType = "application/json; charset=utf-8".toMediaType()
             println(username)
-
+            println(password)
             val jsonBody = """
             {
-                "username": "testUser"
+                "username": "$username",
+                "password": "$password"
             }
         """.trimIndent().toRequestBody(jsonMediaType)
 
@@ -55,10 +52,7 @@ fun UserProfile(navController: NavController) {
             try {
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
-                    val jsonResp = JSONObject(response.body?.string())
                     println("Success: ${JSONObject(response.body?.string())}")
-                    username = jsonResp.getString("username")
-                    description = jsonResp.getString("description")
                 } else {
                     println("Error: ${response.code}")
                 }
@@ -67,7 +61,6 @@ fun UserProfile(navController: NavController) {
             }
         }
     }
-
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -75,15 +68,23 @@ fun UserProfile(navController: NavController) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("WPI Group Finder User Page")
-            Text("$username")
-            Text("$description")
-            AsyncImage(
-                model = "https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg",
-                contentDescription = "test image"
+            Text("Create User")
+            OutlinedTextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("Username") }
             )
-            Text("Clubs go here")
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") }
+            )
+            Button(onClick = { createUserRequest() }){
+                Text("Create User")
+            }
+            Button(onClick = { navController.navigate("login") }){
+                Text("Sign In")
+            }
         }
     }
-
 }
