@@ -27,6 +27,7 @@ import org.json.JSONObject
 fun LoginScreenDesign(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var user_uid by remember { mutableStateOf<Int?>(null) }
 
     fun signInRequest() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -53,6 +54,7 @@ fun LoginScreenDesign(navController: NavController) {
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
                     println("Success: ${JSONObject(response.body?.string())}")
+                    user_uid = JSONObject(response.body?.string()).getString("user_uid").toInt()
                 } else {
                     println("Error: ${response.code}")
                 }
@@ -87,7 +89,7 @@ fun LoginScreenDesign(navController: NavController) {
             Button(onClick = { navController.navigate("signup") }) {
                 Text("Sign Up")
             }
-            Button(onClick = { navController.navigate("user") }) {
+            Button(onClick = { navController.navigate("user/3") }) {
                 Text("View User")
             }
 

@@ -46,7 +46,12 @@ class MainActivity : ComponentActivity() {
             //login
             composable("login") { LoginScreenDesign(navController) }
             composable("signup") { SignupScreenDesign(navController) }
-            composable("user") { UserScreenDesign(navController) }
+            composable(
+                route = "user/{user_uid}"
+            ) { backStackEntry ->
+                val user_uid = backStackEntry.arguments?.getString("user_uid")
+                UserScreenDesign(navController, user_uid)
+            }
 
             //clubOwner
             composable("clubOwner") { ClubOwnerScreenDesign(navController) }

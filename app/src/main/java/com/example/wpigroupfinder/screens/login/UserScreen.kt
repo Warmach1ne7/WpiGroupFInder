@@ -26,11 +26,11 @@ import org.json.JSONObject
 
 
 @Composable
-fun UserScreenDesign(navController: NavController) {
-    var username by remember { mutableStateOf("") }
+fun UserScreenDesign(navController: NavController, user_uid: String?) {
+    val user_uidInt = user_uid?.toInt()
+    var username by remember{ mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var profilePic by remember { mutableStateOf("") }
-
 
     LaunchedEffect("test") {
         CoroutineScope(Dispatchers.IO).launch {
@@ -43,7 +43,7 @@ fun UserScreenDesign(navController: NavController) {
 
             val jsonBody = """
             {
-                "username": "testUser"
+                "user_uid": $user_uidInt
             }
         """.trimIndent().toRequestBody(jsonMediaType)
 
@@ -76,6 +76,7 @@ fun UserScreenDesign(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("WPI Group Finder User Page")
+            Text("$user_uidInt")
             Text("$username")
             Text("$description")
             AsyncImage(
