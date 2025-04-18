@@ -1,4 +1,4 @@
-package com.example.wpigroupfinder
+package com.example.wpigroupfinder.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +22,9 @@ fun HomeScreenDesign(navController: NavController) {
             Text("Centered Column")
             Button(onClick = { navController.navigate("details") }) {
                 Text("Go to Details")
+            }
+            Button(onClick = { navController.navigate("events") }) {
+                Text("Go to events")
             }
         }
     }
