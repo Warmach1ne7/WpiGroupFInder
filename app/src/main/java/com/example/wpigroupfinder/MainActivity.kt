@@ -17,16 +17,49 @@ import com.example.wpigroupfinder.screens.clubowner.EditEventScreenDesign
 import com.example.wpigroupfinder.screens.mainview.EventFeedScreenDesign
 import com.example.wpigroupfinder.screens.login.LoginScreenDesign
 import com.example.wpigroupfinder.screens.mainview.MapScreenDesign
-import com.example.wpigroupfinder.screens.login.SignupScreenDesign
-import com.example.wpigroupfinder.screens.login.UserScreenDesign
 import com.example.wpigroupfinder.screens.mainview.VerificationScreenDesign
 import com.example.wpigroupfinder.screens.mainview.ViewClubPageScreenDesign
 import com.example.wpigroupfinder.screens.mainview.ViewEventScreenDesign
 import com.example.wpigroupfinder.ui.theme.WPIGroupFinderTheme
 
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+
+
+
 class MainActivity : ComponentActivity() {
+    private val ALL_PERMISSIONS = arrayOf(
+        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+        android.Manifest.permission.ACCESS_FINE_LOCATION,
+        android.Manifest.permission.ACTIVITY_RECOGNITION
+    )
+
+    //https://developer.android.com/training/permissions/requesting
+    private val allPermissionsLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val activity = permissions[android.Manifest.permission.ACTIVITY_RECOGNITION]?: false
+            val fine = permissions[android.Manifest.permission.ACCESS_FINE_LOCATION]?: false
+            val coarse = permissions[android.Manifest.permission.ACCESS_COARSE_LOCATION]?: false
+            if (fine && coarse && activity) {
+                Log.d("Permission", "All permissions granted")
+            } else {
+                Log.d("Permission", "Permissions denied")
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.d("Permission", "Launching permissions request. . .")
+            allPermissionsLauncher.launch(ALL_PERMISSIONS)
+        }
+
         enableEdgeToEdge()
         setContent {
             WPIGroupFinderTheme {
@@ -38,20 +71,12 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MyApp() {
         val navController = rememberNavController()
-
         NavHost(
             navController = navController,
-            startDestination = "login"
+            startDestination = "eventFeed"
         ) {
             //login
             composable("login") { LoginScreenDesign(navController) }
-            composable("signup") { SignupScreenDesign(navController) }
-            composable(
-                route = "user/{user_uid}"
-            ) { backStackEntry ->
-                val user_uid = backStackEntry.arguments?.getString("user_uid")
-                UserScreenDesign(navController, user_uid)
-            }
 
             //clubOwner
             composable("clubOwner") { ClubOwnerScreenDesign(navController) }
@@ -74,5 +99,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 
