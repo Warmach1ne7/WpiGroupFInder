@@ -1,4 +1,4 @@
-package com.example.wpigroupfinder
+package com.example.wpigroupfinder.screens.events
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text

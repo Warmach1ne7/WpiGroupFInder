@@ -1,4 +1,4 @@
-package com.example.wpigroupfinder
+package com.example.wpigroupfinder.screens.mainview
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 
 @Composable
-fun HomeScreenDesign(navController: NavController) {
+fun VerificationScreenDesign(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -19,10 +19,14 @@ fun HomeScreenDesign(navController: NavController) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Centered Column")
-            Button(onClick = { navController.navigate("details") }) {
-                Text("Go to Details")
+            Text("Verification Screen (facecam, barcode, etc.")
+            Button(onClick = { navController.navigate("event") }) {
+                Text("Back to Event")
             }
+            Button(onClick = { navController.navigate("eventFeed") }) {
+                Text("Back to all events")
+            }
+
         }
     }
 
