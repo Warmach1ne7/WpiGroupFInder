@@ -71,6 +71,17 @@ class MainActivity : ComponentActivity() {
             }
             composable("viewClubPage") { ViewClubPageScreenDesign(navController) } //will need extra args
             composable("verification") { VerificationScreenDesign(navController) } //will need extra args
+            composable("home") { HomeScreenDesign(navController) }
+            composable("details") { DetailsScreenDesign(navController) }
+            composable("events"){ EventsScreenDesign(navController) }
+            composable(
+                "event/{eventId}",
+                arguments = listOf(navArgument("eventId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val eventId = backStackEntry.arguments?.getInt("eventId")
+                EventDetailsScreenDesign(navController, eventId)
+            }
+            composable("create_event") { CreateEventScreenDesign(navController) }
         }
     }
 }

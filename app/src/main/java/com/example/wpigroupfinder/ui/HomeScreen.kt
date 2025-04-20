@@ -1,4 +1,5 @@
-package com.example.wpigroupfinder.screens.clubowner
+
+package com.example.wpigroupfinder.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ fun EditClubPageScreenDesign(navController: NavController) {
             Button(onClick = { navController.navigate("clubOwner") }) {
                 Text("Back to Club Owner")
             }
+
 
             Button(onClick = { navController.navigate("events") }) {
                 Text("Go to events")
