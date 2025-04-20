@@ -14,6 +14,10 @@ import com.example.wpigroupfinder.screens.clubowner.ClubEventsScreenDesign
 import com.example.wpigroupfinder.screens.clubowner.ClubOwnerScreenDesign
 import com.example.wpigroupfinder.screens.clubowner.EditClubPageScreenDesign
 import com.example.wpigroupfinder.screens.clubowner.EditEventScreenDesign
+import com.example.wpigroupfinder.screens.events.CreateEventScreenDesign
+import com.example.wpigroupfinder.screens.events.DetailsScreenDesign
+import com.example.wpigroupfinder.screens.events.EventDetailsScreenDesign
+import com.example.wpigroupfinder.screens.events.EventsScreenDesign
 import com.example.wpigroupfinder.screens.mainview.EventFeedScreenDesign
 import com.example.wpigroupfinder.screens.login.LoginScreenDesign
 import com.example.wpigroupfinder.screens.mainview.MapScreenDesign
@@ -71,8 +75,7 @@ class MainActivity : ComponentActivity() {
             }
             composable("viewClubPage") { ViewClubPageScreenDesign(navController) } //will need extra args
             composable("verification") { VerificationScreenDesign(navController) } //will need extra args
-            composable("home") { HomeScreenDesign(navController) }
-            composable("details") { DetailsScreenDesign(navController) }
+
             composable("events"){ EventsScreenDesign(navController) }
             composable(
                 "event/{eventId}",

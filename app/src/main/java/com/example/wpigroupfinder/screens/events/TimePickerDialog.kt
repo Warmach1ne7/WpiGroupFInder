@@ -1,4 +1,4 @@
-package com.example.wpigroupfinder.ui
+package com.example.wpigroupfinder.screens.events
 
 import android.app.TimePickerDialog
 import android.content.Context

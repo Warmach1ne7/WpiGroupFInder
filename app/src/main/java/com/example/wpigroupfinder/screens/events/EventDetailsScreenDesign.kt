@@ -1,4 +1,4 @@
-package com.example.wpigroupfinder.ui
+package com.example.wpigroupfinder.screens.events
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
