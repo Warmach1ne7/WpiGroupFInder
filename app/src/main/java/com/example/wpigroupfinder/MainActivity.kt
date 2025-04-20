@@ -18,7 +18,6 @@ import com.example.wpigroupfinder.screens.events.CreateEventScreenDesign
 import com.example.wpigroupfinder.screens.events.DetailsScreenDesign
 import com.example.wpigroupfinder.screens.events.EventDetailsScreenDesign
 import com.example.wpigroupfinder.screens.events.EventsScreenDesign
-import com.example.wpigroupfinder.screens.mainview.EventFeedScreenDesign
 import com.example.wpigroupfinder.screens.login.LoginScreenDesign
 import com.example.wpigroupfinder.screens.mainview.MapScreenDesign
 import com.example.wpigroupfinder.screens.mainview.VerificationScreenDesign
@@ -77,7 +76,7 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         NavHost(
             navController = navController,
-            startDestination = "eventFeed"
+            startDestination = "login"
         ) {
             //login
             composable("login") { LoginScreenDesign(navController) }
@@ -89,7 +88,6 @@ class MainActivity : ComponentActivity() {
             composable("editEvent") { EditEventScreenDesign(navController) }
 
             //all visible
-            composable("eventFeed") { EventFeedScreenDesign(navController) }
             composable("map") { MapScreenDesign(navController) }
             composable(
                 route = "viewEvent/{eventId}",

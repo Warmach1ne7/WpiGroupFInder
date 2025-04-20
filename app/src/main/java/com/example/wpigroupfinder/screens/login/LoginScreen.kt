@@ -97,6 +97,10 @@ fun LoginScreenDesign(navController: NavController) {
                 Text("Go to events")
             }
 
+            Button(onClick = { navController.navigate("map") }) {
+                Text("View Map")
+            }
+
         }
     }
 }
