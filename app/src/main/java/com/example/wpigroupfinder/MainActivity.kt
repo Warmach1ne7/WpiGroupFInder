@@ -29,7 +29,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-
+import com.example.wpigroupfinder.screens.login.FaceRecogScreenDesign
 
 
 class MainActivity : ComponentActivity() {
@@ -108,6 +108,7 @@ class MainActivity : ComponentActivity() {
                 EventDetailsScreenDesign(navController, eventId)
             }
             composable("create_event") { CreateEventScreenDesign(navController) }
+            composable("faceRecog") { FaceRecogScreenDesign(navController) }
         }
     }
 }

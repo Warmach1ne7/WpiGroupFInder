@@ -101,6 +101,10 @@ fun LoginScreenDesign(navController: NavController) {
                 Text("View Map")
             }
 
+            Button(onClick = { navController.navigate("faceRecog") }) {
+                Text("View Camera")
+            }
+
         }
     }
 }

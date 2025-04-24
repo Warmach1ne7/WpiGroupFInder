@@ -69,6 +69,9 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.play.services.tasks)
     implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.face.mesh.detection)
+    implementation(libs.play.services.mlkit.face.detection)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -88,6 +91,17 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+
+    // CameraX core library
+    implementation("androidx.camera:camera-core:1.4.2")
+
+    // ✅ Include the Camera2 implementation!
+    implementation("androidx.camera:camera-camera2:1.4.2")
+
+    // Optional: Lifecycle & View support
+    implementation("androidx.camera:camera-lifecycle:1.4.2")
+    implementation("androidx.camera:camera-view:1.4.2")
+    implementation("androidx.camera:camera-extensions:1.4.2")
    
 
 }
