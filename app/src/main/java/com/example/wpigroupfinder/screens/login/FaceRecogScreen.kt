@@ -8,6 +8,7 @@ import android.media.FaceDetector
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
@@ -28,8 +29,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.Filled
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
@@ -66,25 +73,22 @@ import com.google.mlkit.vision.facemesh.FaceMesh
 fun FaceRecogScreenDesign(navController: NavController) {
     var (selected, setSelected) = remember { mutableStateOf("") }
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val controller = remember {
         LifecycleCameraController(context).apply {
             setEnabledUseCases(CameraController.IMAGE_CAPTURE)
         }
     }
-    val cameraPermission = Manifest.permission.CAMERA
+    // 👇 This controls the lens (front vs back)
+    var lensFacing by remember { mutableStateOf(CameraSelector.LENS_FACING_BACK) }
 
-    var hasPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(context, cameraPermission) == PackageManager.PERMISSION_GRANTED
-        )
+    // 👀 Watch lensFacing and rebind camera
+    LaunchedEffect(lensFacing) {
+        controller.cameraSelector = CameraSelector.Builder()
+            .requireLensFacing(lensFacing)
+            .build()
+        controller.bindToLifecycle(lifecycleOwner)
     }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        hasPermission = granted
-    }
-
 
     val capturedImage = remember { mutableStateOf<Bitmap?>(null) }
     var rememberBool by remember { mutableStateOf(false) }
@@ -95,12 +99,29 @@ fun FaceRecogScreenDesign(navController: NavController) {
     val faceDetectorProcessor = remember { FaceDetectorProcessor() }
     val faceMeshProcessor = remember { FaceMeshDetectorProcessor() }
 
+    val CAMERA_PERMISSIONS = arrayOf(
+        Manifest.permission.CAMERA
+    )
+    var hasCameraPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasCameraPermission = isGranted
+    }
+
+    LaunchedEffect(Unit) {
+        if (!hasCameraPermission) {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
+
     //when an image is captured, launch detection code
     LaunchedEffect(capturedImage.value) {
-        if (!hasPermission) {
-            permissionLauncher.launch(cameraPermission)
-        }
-
 
         capturedImage.value?.let { bitmap ->
             detectedFaces = faceDetectorProcessor.detectInImage(bitmap)
@@ -117,12 +138,14 @@ fun FaceRecogScreenDesign(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ){
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(500.dp),
             contentAlignment = Alignment.Center
         ){
+
             if(capturedImage.value != null){
                 Log.d("Test", "Hello!!!!")
                 Image(
@@ -166,12 +189,36 @@ fun FaceRecogScreenDesign(navController: NavController) {
 
                 //live camera
             }else{
-                CameraPreview(
-                    controller = controller,
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .height(500.dp)
-                )
+                ) {
+                    CameraPreview(
+                        controller = controller,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+
+                    IconButton(
+                        onClick = {
+                            lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
+                                CameraSelector.LENS_FACING_FRONT
+                            } else {
+                                CameraSelector.LENS_FACING_BACK
+                            }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(16.dp)           
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = "Flip Camera"
+                        )
+                    }
+                }
+
 
 
             }
@@ -352,6 +399,8 @@ private fun takePhoto(
         }
     )
 }
+
+
 
 @Composable
 fun CameraPreview(controller: LifecycleCameraController, modifier: Modifier){
