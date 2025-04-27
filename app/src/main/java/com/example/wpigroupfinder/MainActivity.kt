@@ -30,6 +30,7 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.wpigroupfinder.screens.login.FaceRecogScreenDesign
+import com.example.wpigroupfinder.screens.login.SignupScreenDesign
 
 
 class MainActivity : ComponentActivity() {
@@ -80,6 +81,7 @@ class MainActivity : ComponentActivity() {
         ) {
             //login
             composable("login") { LoginScreenDesign(navController) }
+            composable("signup") { SignupScreenDesign(navController) }
 
             //clubOwner
             composable("clubOwner") { ClubOwnerScreenDesign(navController) }

@@ -86,7 +86,7 @@ fun LoginScreenDesign(navController: NavController) {
             Button(onClick = { signInRequest() }) {
                 Text("Login")
             }
-            Button(onClick = { navController.navigate("signup") }) {
+            Button(onClick = { navController.navigate("faceRecog") }) {
                 Text("Sign Up")
             }
             Button(onClick = { navController.navigate("user/3") }) {
@@ -101,9 +101,7 @@ fun LoginScreenDesign(navController: NavController) {
                 Text("View Map")
             }
 
-            Button(onClick = { navController.navigate("faceRecog") }) {
-                Text("View Camera")
-            }
+
 
         }
     }

@@ -80,7 +80,7 @@ fun FaceRecogScreenDesign(navController: NavController) {
         }
     }
     // 👇 This controls the lens (front vs back)
-    var lensFacing by remember { mutableStateOf(CameraSelector.LENS_FACING_BACK) }
+    var lensFacing by remember { mutableStateOf(CameraSelector.LENS_FACING_FRONT) }
 
     // 👀 Watch lensFacing and rebind camera
     LaunchedEffect(lensFacing) {
@@ -88,6 +88,7 @@ fun FaceRecogScreenDesign(navController: NavController) {
             .requireLensFacing(lensFacing)
             .build()
         controller.bindToLifecycle(lifecycleOwner)
+
     }
 
     val capturedImage = remember { mutableStateOf<Bitmap?>(null) }
@@ -98,6 +99,8 @@ fun FaceRecogScreenDesign(navController: NavController) {
 
     val faceDetectorProcessor = remember { FaceDetectorProcessor() }
     val faceMeshProcessor = remember { FaceMeshDetectorProcessor() }
+
+    var loading by remember { mutableStateOf(false) }
 
     val CAMERA_PERMISSIONS = arrayOf(
         Manifest.permission.CAMERA
@@ -130,6 +133,8 @@ fun FaceRecogScreenDesign(navController: NavController) {
         capturedImage.value?.let { bitmap ->
             detectedFacesMesh = faceMeshProcessor.detectInImageMesh(bitmap)
         }
+        loading = false
+
     }
 
     Column(
@@ -164,6 +169,7 @@ fun FaceRecogScreenDesign(navController: NavController) {
                     //draws specific face graphic on canvas
                     //TODO: fix incorrect scaling/misplacement
                     Canvas(modifier = Modifier.fillMaxSize()) {
+
                         if(selected != "none" || selected != "") {
                             if (selected == "cd") {
 
@@ -186,8 +192,6 @@ fun FaceRecogScreenDesign(navController: NavController) {
                     }
                 }
 
-
-                //live camera
             }else{
                 Box(
                     modifier = Modifier
@@ -210,7 +214,7 @@ fun FaceRecogScreenDesign(navController: NavController) {
                         },
                         modifier = Modifier
                             .align(Alignment.TopStart)
-                            .padding(16.dp)           
+                            .padding(30.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Refresh,
@@ -218,9 +222,6 @@ fun FaceRecogScreenDesign(navController: NavController) {
                         )
                     }
                 }
-
-
-
             }
         }
 
@@ -228,136 +229,180 @@ fun FaceRecogScreenDesign(navController: NavController) {
             .height(50.dp)
         )
 
-        Button(
-            modifier = Modifier
-                .width(400.dp)
-                .padding(vertical = 8.dp),
-            onClick = {
-                takePhoto(context = context, controller = controller, onPhotoTaken = { bitmap ->
-                    capturedImage.value = bitmap
-                })
-            },
-            shape = RoundedCornerShape(1.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xff9910e3),
-                contentColor = Color.White
-            )
-        ){
-            Text("Take a picture", fontSize = 20.sp)
+        if(loading) {
+            Text("Loading...", fontSize = 20.sp)
+        }
+        if(capturedImage.value == null) {
+            Button(
+                modifier = Modifier
+                    .width(400.dp)
+                    .padding(vertical = 8.dp),
+                onClick = {
+                    loading = true
+
+                    setSelected("fd")
+                    takePhoto(context = context, controller = controller, onPhotoTaken = { bitmap ->
+                        capturedImage.value = bitmap
+                    })
+
+                },
+                shape = RoundedCornerShape(1.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xff9910e3),
+                    contentColor = Color.White
+                )
+            ) {
+                Text("Verify Humanity", fontSize = 20.sp)
+            }
         }
         Spacer(modifier = Modifier
             .height(10.dp)
         )
-        Row(
-            modifier = Modifier
-                .height(50.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            RadioButton(
-                selected = ("none" == selected),
-                onClick = { detectedFaces = emptyList(); setSelected("none");},
-                modifier = Modifier.scale(1.5f)
-            )
-            Text(
-                modifier = Modifier.padding(start = 16.dp),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                text = "None")
-        }
 
-        Spacer(modifier = Modifier
-            .height(5.dp)
-        )
-        Row(
-            modifier = Modifier
-                .height(50.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            RadioButton(
-                selected = ("fd" == selected),
-                onClick = {setSelected("fd"); },
-                modifier = Modifier.scale(1.5f)
-            )
-            Text(
-                modifier = Modifier.padding(start = 16.dp),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                text = "Face detection")
-            Text(
-                modifier = Modifier.padding(start = 16.dp),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                text = "${detectedFaces.size} face detected")
-        }
-        Spacer(modifier = Modifier
-            .height(5.dp)
-        )
-        Row(
-            modifier = Modifier
-                .height(50.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            RadioButton(
-                selected = ("cd" == selected),
-                onClick = {setSelected("cd")},
-                modifier = Modifier.scale(1.5f)
-            )
-            Text(
-                modifier = Modifier.padding(start = 16.dp),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                text = "Contour detection")
-        }
 
-        Spacer(modifier = Modifier
-            .height(5.dp)
-        )
-        Row(
-            modifier = Modifier
-                .height(50.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            RadioButton(
-                selected = ("md" == selected),
-                onClick = {setSelected("md")},
-                modifier = Modifier.scale(1.5f)
-            )
-            Text(
-                modifier = Modifier.padding(start = 16.dp),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                text = "Mesh detection")
+        if(detectedFaces.isNotEmpty()){
+            Button(
+                modifier = Modifier
+                    .width(400.dp)
+                    .padding(vertical = 8.dp),
+                onClick = {
+                    navController.navigate("signup")
+                },
+                shape = RoundedCornerShape(1.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xff9910e3),
+                    contentColor = Color.White
+                )
+            ){
+                Text("Continue", fontSize = 20.sp)
+            }
+        } else if (capturedImage.value != null && detectedFaces.isEmpty() && !loading){
+            Button(
+                modifier = Modifier
+                    .width(400.dp)
+                    .padding(vertical = 8.dp),
+                onClick = {
+                    capturedImage.value = null
+                },
+                shape = RoundedCornerShape(1.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xff9910e3),
+                    contentColor = Color.White
+                )
+            ){
+                Text("Try Again", fontSize = 20.sp)
+            }
         }
-
-        Spacer(modifier = Modifier
-            .height(5.dp)
-        )
-        Row(
-            modifier = Modifier
-                .height(50.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            RadioButton(
-                selected = ("ss" == selected),
-                onClick = {setSelected("ss")},
-                modifier = Modifier.scale(1.5f)
-            )
-            Text(
-                modifier = Modifier.padding(start = 16.dp),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                text = "Selfie segmentation")
-        }
+//        Row(
+//            modifier = Modifier
+//                .height(50.dp)
+//                .fillMaxWidth()
+//                .padding(horizontal = 16.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ){
+//            RadioButton(
+//                selected = ("none" == selected),
+//                onClick = { detectedFaces = emptyList(); setSelected("none");},
+//                modifier = Modifier.scale(1.5f)
+//            )
+//            Text(
+//                modifier = Modifier.padding(start = 16.dp),
+//                fontSize = 18.sp,
+//                fontWeight = FontWeight.Bold,
+//                text = "None")
+//        }
+//
+//        Spacer(modifier = Modifier
+//            .height(5.dp)
+//        )
+//        Row(
+//            modifier = Modifier
+//                .height(50.dp)
+//                .fillMaxWidth()
+//                .padding(horizontal = 16.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ){
+//            RadioButton(
+//                selected = ("fd" == selected),
+//                onClick = {setSelected("fd"); },
+//                modifier = Modifier.scale(1.5f)
+//            )
+//            Text(
+//                modifier = Modifier.padding(start = 16.dp),
+//                fontSize = 18.sp,
+//                fontWeight = FontWeight.Bold,
+//                text = "Face detection")
+//            Text(
+//                modifier = Modifier.padding(start = 16.dp),
+//                fontSize = 18.sp,
+//                fontWeight = FontWeight.Bold,
+//                text = "${detectedFaces.size} face detected")
+//        }
+//        Spacer(modifier = Modifier
+//            .height(5.dp)
+//        )
+//        Row(
+//            modifier = Modifier
+//                .height(50.dp)
+//                .fillMaxWidth()
+//                .padding(horizontal = 16.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ){
+//            RadioButton(
+//                selected = ("cd" == selected),
+//                onClick = {setSelected("cd")},
+//                modifier = Modifier.scale(1.5f)
+//            )
+//            Text(
+//                modifier = Modifier.padding(start = 16.dp),
+//                fontSize = 18.sp,
+//                fontWeight = FontWeight.Bold,
+//                text = "Contour detection")
+//        }
+//
+//        Spacer(modifier = Modifier
+//            .height(5.dp)
+//        )
+//        Row(
+//            modifier = Modifier
+//                .height(50.dp)
+//                .fillMaxWidth()
+//                .padding(horizontal = 16.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ){
+//            RadioButton(
+//                selected = ("md" == selected),
+//                onClick = {setSelected("md")},
+//                modifier = Modifier.scale(1.5f)
+//            )
+//            Text(
+//                modifier = Modifier.padding(start = 16.dp),
+//                fontSize = 18.sp,
+//                fontWeight = FontWeight.Bold,
+//                text = "Mesh detection")
+//        }
+//
+//        Spacer(modifier = Modifier
+//            .height(5.dp)
+//        )
+//        Row(
+//            modifier = Modifier
+//                .height(50.dp)
+//                .fillMaxWidth()
+//                .padding(horizontal = 16.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ){
+//            RadioButton(
+//                selected = ("ss" == selected),
+//                onClick = {setSelected("ss")},
+//                modifier = Modifier.scale(1.5f)
+//            )
+//            Text(
+//                modifier = Modifier.padding(start = 16.dp),
+//                fontSize = 18.sp,
+//                fontWeight = FontWeight.Bold,
+//                text = "Selfie segmentation")
+//        }
     }
 
 
