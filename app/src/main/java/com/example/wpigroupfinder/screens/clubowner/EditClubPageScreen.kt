@@ -73,7 +73,7 @@ fun EditClubPageScreenDesign(navController: NavController, clubid: String, useri
         }
     }
 
-    fun createUserRequest(){
+    fun editClubRequest(){
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
 
@@ -105,6 +105,7 @@ fun EditClubPageScreenDesign(navController: NavController, clubid: String, useri
                 println("Exception: ${e.message}")
             }
         }
+        navController.navigate("clubOwner/${clubIdInt}/${userIdInt}")
     }
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -124,7 +125,7 @@ fun EditClubPageScreenDesign(navController: NavController, clubid: String, useri
                 onValueChange = { clubDesc = it },
                 label = { Text("About Club") }
             )
-            Button(onClick = {}) {
+            Button(onClick = {editClubRequest()}) {
                 Text("Save Changes")
             }
         }

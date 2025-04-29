@@ -90,7 +90,12 @@ class MainActivity : ComponentActivity() {
                 val userid = backStackEntry.arguments?.getString("userid")
                 ClubOwnerScreenDesign(navController, clubid!!, userid!!) }
             composable("clubEvents") { ClubEventsScreenDesign(navController) }
-            composable("editClubPage") { EditClubPageScreenDesign(navController) }
+            composable("editClub/{clubid}/{userid}") {
+                backStackEntry ->
+                val clubid = backStackEntry.arguments?.getString("clubid")
+                val userid = backStackEntry.arguments?.getString("userid")
+                EditClubPageScreenDesign(navController, clubid!!, userid!!)
+            }
             composable("editEvent") { EditEventScreenDesign(navController) }
             composable("createClub/{userid}") { backStackEntry ->
                 val userid = backStackEntry.arguments?.getString("userid")
