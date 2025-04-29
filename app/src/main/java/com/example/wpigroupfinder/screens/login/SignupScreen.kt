@@ -120,7 +120,7 @@ fun SignupScreenDesign(navController: NavController) {
                 onValueChange = { password = it },
                 label = { Text("Password") }
             )
-            Button(onClick = { createUserRequest() }){
+            Button(onClick = { navController.navigate("faceRecog") }){
                 Text("Create User")
             }
             Button(onClick = { navController.navigate("login") }){

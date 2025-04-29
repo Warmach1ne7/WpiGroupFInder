@@ -24,11 +24,12 @@ import com.example.wpigroupfinder.screens.mainview.VerificationScreenDesign
 import com.example.wpigroupfinder.screens.mainview.ViewClubPageScreenDesign
 import com.example.wpigroupfinder.screens.mainview.ViewEventScreenDesign
 import com.example.wpigroupfinder.ui.theme.WPIGroupFinderTheme
-
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import com.example.wpigroupfinder.screens.login.FaceRecogScreenDesign
+import com.example.wpigroupfinder.screens.login.SignupScreenDesign
 import com.example.wpigroupfinder.screens.clubowner.CreateClubScreenDesign
 import com.example.wpigroupfinder.screens.login.SignupScreenDesign
 import com.example.wpigroupfinder.screens.login.UserScreenDesign
@@ -82,6 +83,7 @@ class MainActivity : ComponentActivity() {
         ) {
             //login
             composable("login") { LoginScreenDesign(navController) }
+            composable("signup") { SignupScreenDesign(navController) }
 
             //clubOwner
             composable("clubOwner/{clubid}/{userid}") {
@@ -128,6 +130,7 @@ class MainActivity : ComponentActivity() {
                 EventDetailsScreenDesign(navController, eventId)
             }
             composable("create_event") { CreateEventScreenDesign(navController) }
+            composable("faceRecog") { FaceRecogScreenDesign(navController) }
         }
     }
 }
