@@ -1,5 +1,6 @@
 package com.example.wpigroupfinder.screens.login
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,23 +28,22 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
-
 @Composable
 fun UserScreenDesign(navController: NavController, user_uid: String?) {
     val user_uidInt = user_uid?.toInt()
     var username by remember{ mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var profilePic by remember { mutableStateOf("") }
-
+    var profilePic by remember { mutableStateOf("https://wpigroupfinder.s3.us-east-2.amazonaws.com/images/test_pfp.jpg") }
+    var clubsList = remember { mutableStateListOf<JSONObject>() }
     LaunchedEffect("test") {
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
 
-            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/signIn"
+            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/getUser"
 
             val jsonMediaType = "application/json; charset=utf-8".toMediaType()
-            println(username)
-
+            //println(username)
+            println("uid: $user_uidInt")
             val jsonBody = """
             {
                 "user_uid": $user_uidInt
@@ -56,13 +57,20 @@ fun UserScreenDesign(navController: NavController, user_uid: String?) {
 
             try {
                 val response = client.newCall(request).execute()
-                if (response.isSuccessful) {
-                    val jsonResp = JSONObject(response.body?.string())
-                    println("Success: ${JSONObject(response.body?.string())}")
-                    username = jsonResp.getString("username")
-                    description = jsonResp.getString("description")
-                } else {
-                    println("Error: ${response.code}")
+                response.use {
+                    val bodyString = it.body?.string()
+                    println("Raw response: $bodyString")
+
+                    if (it.isSuccessful && bodyString != null) {
+                        val topLevel = JSONObject(bodyString)
+                        val body = topLevel.getJSONObject("body")
+                        val user = body.getJSONObject("user")
+                        username = user.getString("username")
+                        description = user.getString("description")
+                        println("User UID: $user_uid")
+                    } else {
+                        println("Error: ${it.code}")
+                    }
                 }
             } catch (e: Exception) {
                 println("Exception: ${e.message}")
@@ -77,15 +85,25 @@ fun UserScreenDesign(navController: NavController, user_uid: String?) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Text("WPI Group Finder User Page")
             Text("$user_uidInt")
             Text("$username")
             Text("$description")
             AsyncImage(
-                model = "https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg",
+                model = profilePic,
                 contentDescription = "test image"
             )
-            Text("Clubs go here")
+            Column {
+                clubsList.forEach{club ->
+                    Text(text = club.getString("name"),
+                        modifier = Modifier.clickable { println("TODO: clickable") })
+                }
+            }
+            Button(onClick = { navController.navigate("login") }){
+                Text("Sign Out")
+            }
+
         }
     }
 

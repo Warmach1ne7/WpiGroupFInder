@@ -1,4 +1,4 @@
-package com.example.wpigroupfinder.screens.login
+package com.example.wpigroupfinder.screens.clubowner
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -43,37 +43,26 @@ import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
 @Composable
-fun SignupScreenDesign(navController: NavController) {
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var imageUri by remember {mutableStateOf<Uri?>(null)}
-    var profilePic: Any? = imageUri ?: "https://wpigroupfinder.s3.us-east-2.amazonaws.com/images/test_pfp.jpg"
-    val context = LocalContext.current
-    var launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        imageUri = uri
-    }
+fun CreateClubScreenDesign(navController: NavController, userid: String?) {
+    var clubname by remember { mutableStateOf("") }
+    var clubdesc by remember { mutableStateOf("") }
+    val user_uidInt = userid?.toInt()
 
-    fun uriToByteArray(context: Context, uri: Uri?): ByteArray{
-        return context.contentResolver.openInputStream(uri!!)?.readBytes()
-            ?: throw IllegalArgumentException("Cannot open input stream from URI")
-    }
-
-    fun createUserRequest(){
+    fun createClubRequest(){
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
 
-            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/createUser"
+            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/createClub"
 
             val jsonMediaType = "application/json; charset=utf-8".toMediaType()
-            println(username)
-            println(password)
+            println(clubname)
+            println(clubdesc)
 
             val jsonBody = """
             {
-                "username": "$username",
-                "password": "$password"
+                "clubname": "$clubname",
+                "clubdesc": "$clubdesc",
+                "user_uid": "$user_uidInt"
             }
         """.trimIndent().toRequestBody(jsonMediaType)
 
@@ -84,10 +73,18 @@ fun SignupScreenDesign(navController: NavController) {
 
             try {
                 val response = client.newCall(request).execute()
-                if (response.isSuccessful) {
-                    println("Success: ${JSONObject(response.body?.string())}")
-                } else {
-                    println("Error: ${response.code}")
+                response.use {
+                    val bodyString = it.body?.string()
+                    println("Raw response: $bodyString")
+
+                    if (it.isSuccessful && bodyString != null) {
+                        val topLevel = JSONObject(bodyString)
+                        val body = topLevel.getJSONObject("body")
+                        val club_uid = body.getString("club_uid")
+                        navController.navigate("clubOwner/$club_uid/$user_uidInt")
+                    } else {
+                        println("Error: ${it.code}")
+                    }
                 }
             } catch (e: Exception) {
                 println("Exception: ${e.message}")
@@ -102,34 +99,19 @@ fun SignupScreenDesign(navController: NavController) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Create User")
-            AsyncImage(
-                model = profilePic,
-                contentDescription = "test image",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
+            Text("Create Club")
+            OutlinedTextField(
+                value = clubname,
+                onValueChange = { clubname = it },
+                label = { Text("Club Name") }
             )
             OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") }
+                value = clubdesc,
+                onValueChange = { clubdesc = it },
+                label = { Text("Club Description") }
             )
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") }
-            )
-            Button(onClick = { createUserRequest() }){
-                Text("Create User")
-            }
-            Button(onClick = { navController.navigate("login") }){
-                Text("Sign In")
-            }
-            Button(
-                onClick = {}
-            ){
-                Text("Back")
+            Button(onClick = { createClubRequest() }){
+                Text("Create Club")
             }
         }
     }
