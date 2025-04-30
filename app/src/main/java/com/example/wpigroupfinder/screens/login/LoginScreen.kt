@@ -83,7 +83,7 @@ fun LoginScreenDesign(navController: NavController) {
                 onValueChange = { password = it },
                 label = { Text("Password") }
             )
-            Button(onClick = { navController.navigate("events") }) { //TODO change this
+            Button(onClick = { signInRequest() }) { //TODO change this
                 Text("Login")
             }
             Button(onClick = { navController.navigate("signup") }) {
