@@ -171,6 +171,14 @@ fun EventsScreenDesign(navController: NavController, user_uid: String?) {
             ) {
                 Text("Registered Events")
             }
+            Button(
+                onClick = { navController.navigate("club_screen/${user_uid}") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                Text("Clubs")
+            }
 
             Button(
                 onClick = { navController.navigate("map/${user_uid}") },
