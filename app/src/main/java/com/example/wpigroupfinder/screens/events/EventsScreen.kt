@@ -1,5 +1,6 @@
 package com.example.wpigroupfinder.screens.events
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -52,13 +53,69 @@ suspend fun getAllEvents(): List<Event> = withContext(Dispatchers.IO) {
     val responseBody = response.body?.string()
 
     if (!response.isSuccessful || responseBody == null) {
+
         return@withContext emptyList<Event>()
     }
+    Log.d("DEBUG", responseBody.toString())
 
     val events = mutableListOf<Event>()
     val json = JSONObject(responseBody)
     val eventsArray: JSONArray = json.optJSONArray("events") ?: JSONArray()
 
+    Log.d("DEBUG", eventsArray.toString())
+
+    for (i in 0 until eventsArray.length()) {
+        val obj = eventsArray.getJSONObject(i)
+        events.add(
+            Event(
+                id = obj.optInt("event_id"),
+                title = obj.optString("eventName"),
+                date = obj.optString("date"),
+                location = obj.optString("location"),
+                description = obj.optString("Description"),
+                startTime = obj.optString("start_time"),
+                endTime = obj.optString("end_time"),
+                clubId = obj.optInt("club_id"),
+                createdBy = obj.optInt("createdBy")
+            )
+        )
+    }
+    events
+}
+
+suspend fun getClubEvents(clubID: String?): List<Event> = withContext(Dispatchers.IO) {
+    val client = OkHttpClient()
+    val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/getClubEvents" // Replace with your actual endpoint
+    val x = clubID?.toInt()
+    val jsonBody = """
+    {
+        "club_uid": $x
+    }
+""".trimIndent()
+    val requestBody = jsonBody.toRequestBody("application/json; charset=utf-8".toMediaType())
+    val request = Request.Builder()
+        .url(url)
+        .post(requestBody)
+        .build()
+
+    val response = client.newCall(request).execute()
+    val responseBody = response.body?.string()
+
+    if (!response.isSuccessful || responseBody == null) {
+
+        return@withContext emptyList<Event>()
+    }
+    Log.d("DEBUG", responseBody.toString())
+
+    val topLevelJson = JSONObject(responseBody)
+    val nestedBodyString = topLevelJson.optString("body")  // "body" is a string
+
+    val nestedJson = JSONObject(nestedBodyString)  // Now parse the nested JSON string
+    val eventsArray: JSONArray = nestedJson.optJSONArray("events") ?: JSONArray()
+
+    Log.d("DEBUG", eventsArray.toString())
+
+    val events = mutableListOf<Event>()
     for (i in 0 until eventsArray.length()) {
         val obj = eventsArray.getJSONObject(i)
         events.add(
@@ -104,7 +161,7 @@ fun EventListItem(event: Event, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventsScreenDesign(navController: NavController, user_uid: String?) {
+fun EventsScreenDesign(navController: NavController, user_uid: String?, club_id: String?) {
     var events by remember { mutableStateOf<List<Event>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -114,7 +171,13 @@ fun EventsScreenDesign(navController: NavController, user_uid: String?) {
     LaunchedEffect(Unit) {
         try {
             isLoading = true
-            events = getAllEvents()
+            if (club_id == null){
+                events = getAllEvents()
+            } else {
+                events = getClubEvents(club_id)
+                println("events.responsebodything $events")
+            }
+
             errorMessage = null
         } catch (e: Exception) {
             errorMessage = "Failed to load events: ${e.localizedMessage}"

@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateEventScreenDesign(navController: NavController, clubName: String?) {
+fun CreateEventScreenDesign(navController: NavController, clubId: String?, clubName: String?) {
     // State holders for form fields
     var title by remember { mutableStateOf("") }
     var date by remember { mutableStateOf<LocalDate?>(null) }
@@ -43,7 +43,7 @@ fun CreateEventScreenDesign(navController: NavController, clubName: String?) {
     var showError by remember { mutableStateOf<String?>(null) }
     val userId = 100
     var createdBy by remember { mutableStateOf<Int?>(null) }
-    var clubId by remember { mutableStateOf("") }
+    var clubId by remember { mutableStateOf(clubId) }
     val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
     val timeFormatter = DateTimeFormatter.ofPattern("hh:mm a")
     val context = LocalContext.current
@@ -76,7 +76,7 @@ fun CreateEventScreenDesign(navController: NavController, clubName: String?) {
                 date = formattedDate,
                 startTime = formattedStartTime,
                 endTime = formattedEndTime,
-                clubId = userId,
+                clubId = clubId?.toInt(),
                 createdBy = userId
             )
 
@@ -244,7 +244,7 @@ fun CreateEventScreenDesign(navController: NavController, clubName: String?) {
                 clubNameActual = clubName
             }
             OutlinedTextField(//TODO ADD CLUB DROP DOWN TO GET CLUB ID
-                value = clubId,
+                value = clubNameActual,
                 onValueChange = { clubId = it },
                 readOnly = true,
                 label = { Text(clubNameActual) },

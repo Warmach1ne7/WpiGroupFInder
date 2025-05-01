@@ -133,7 +133,14 @@ class MainActivity : ComponentActivity() {
             composable("events/{userid}"){
                 backStackEntry ->
                 val userid = backStackEntry.arguments?.getString("userid")
-                EventsScreenDesign(navController, userid)
+                EventsScreenDesign(navController, userid, null)
+            }
+
+            composable("events/{userid}/{clubid}"){
+                    backStackEntry ->
+                val clubid = backStackEntry.arguments?.getString("clubid")
+                val userid = backStackEntry.arguments?.getString("userid")
+                EventsScreenDesign(navController, userid, clubid)
             }
             composable("registered_events/{userid}") { backStackEntry ->
                 val userid = backStackEntry.arguments?.getString("userid")
@@ -146,11 +153,12 @@ class MainActivity : ComponentActivity() {
                 val userId = backStackEntry.arguments?.getString("userId")
                 EventDetailsScreenDesign(navController, eventId, userId)
             }
-            composable("create_event") { CreateEventScreenDesign(navController, null) }
-            composable("create_event/{clubName}")
+            composable("create_event") { CreateEventScreenDesign(navController, null, null) }
+            composable("create_event/{clubId}/{clubName}")
                 { backStackEntry ->
+                val clubId = backStackEntry.arguments?.getString("clubId")
                 val clubName = backStackEntry.arguments?.getString("clubName")
-                CreateEventScreenDesign(navController, clubName )
+                CreateEventScreenDesign(navController, clubId, clubName )
             }
             composable("faceRecog") { FaceRecogScreenDesign(navController) }
         }

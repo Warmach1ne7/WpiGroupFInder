@@ -344,7 +344,7 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
                     }
                     if(clubOwnerUid == userIdInt){
                         Button(
-                            onClick = { navController.navigate("create_event/$clubName") },
+                            onClick = { navController.navigate("create_event/${clubIdInt}/${clubName}") },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
@@ -354,12 +354,12 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
                     }
 
                     Button(
-                        onClick = { navController.navigate("events/${userIdInt}") },
+                        onClick = { navController.navigate("events/${userIdInt}/${clubIdInt}") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
                     ) {
-                        Text("Go To Events")
+                        Text("Go To Club Events")
                     }
                 }
             }
