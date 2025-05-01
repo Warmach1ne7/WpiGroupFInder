@@ -31,13 +31,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.Icons.Filled
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -69,6 +74,7 @@ import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.facemesh.FaceMesh
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FaceRecogScreenDesign(navController: NavController) {
     var (selected, setSelected) = remember { mutableStateOf("") }
@@ -101,6 +107,8 @@ fun FaceRecogScreenDesign(navController: NavController) {
     val faceMeshProcessor = remember { FaceMeshDetectorProcessor() }
 
     var loading by remember { mutableStateOf(false) }
+
+    var tempLoading = false
 
     val CAMERA_PERMISSIONS = arrayOf(
         Manifest.permission.CAMERA
@@ -136,161 +144,201 @@ fun FaceRecogScreenDesign(navController: NavController) {
         loading = false
 
     }
-
-    Column(
-        modifier = Modifier
-            .padding(PaddingValues()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly
-    ){
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(500.dp),
-            contentAlignment = Alignment.Center
-        ){
-
-            if(capturedImage.value != null){
-                Log.d("Test", "Hello!!!!")
-                Image(
-                    bitmap = capturedImage.value!!.asImageBitmap(),
-                    contentDescription = "Captured Photo",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(2.dp)),
-                    contentScale = ContentScale.Crop
-                )
-
-                //if a picture has been taken
-                if(detectedFaces.isNotEmpty() && detectedFacesMesh.isNotEmpty()){
-                    Log.d("Test", "Attempted to Draw Graphic")
-
-                    //draws specific face graphic on canvas
-                    //TODO: fix incorrect scaling/misplacement
-                    Canvas(modifier = Modifier.fillMaxSize()) {
-
-                        if(selected != "none" || selected != "") {
-                            if (selected == "cd") {
-
-                            } else {
-
-                            }
-                            val f = FaceGraphic(
-                                detectedFaces[0],
-                                capturedImage.value!!.width,
-                                size.width
-                            )
-                            f.setDrawBool(rememberBool)
-                            f.draw(drawContext.canvas.nativeCanvas)
-
-                            if(selected == "md") {
-                                val g = FaceMeshGraphic(detectedFacesMesh[0], capturedImage.value!!.width,size.width)
-                                g.draw(drawContext.canvas.nativeCanvas)
-                            }
-                        }
-                    }
-                }
-
-            }else{
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(500.dp)
-                ) {
-                    CameraPreview(
-                        controller = controller,
-                        modifier = Modifier
-                            .fillMaxSize()
-                    )
-
-                    IconButton(
-                        onClick = {
-                            lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
-                                CameraSelector.LENS_FACING_FRONT
-                            } else {
-                                CameraSelector.LENS_FACING_BACK
-                            }
-                        },
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(30.dp)
-                    ) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Filled.Refresh,
-                            contentDescription = "Flip Camera"
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
                         )
                     }
                 }
-            }
+            )
         }
-
-        Spacer(modifier = Modifier
-            .height(50.dp)
-        )
-
-        if(loading) {
-            Text("Loading...", fontSize = 20.sp)
-        }
-        if(capturedImage.value == null) {
-            Button(
-                modifier = Modifier
-                    .width(400.dp)
-                    .padding(vertical = 8.dp),
-                onClick = {
-                    loading = true
-
-                    setSelected("fd")
-                    takePhoto(context = context, controller = controller, onPhotoTaken = { bitmap ->
-                        capturedImage.value = bitmap
-                    })
-
-                },
-                shape = RoundedCornerShape(1.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xff9910e3),
-                    contentColor = Color.White
-                )
-            ) {
-                Text("Verify Humanity", fontSize = 20.sp)
+    ) { innerPadding ->
+        when {
+            tempLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
-        }
-        Spacer(modifier = Modifier
-            .height(10.dp)
-        )
+
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .padding(PaddingValues()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceEvenly
+                ) {
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(500.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        if (capturedImage.value != null) {
+                            Log.d("Test", "Hello!!!!")
+                            Image(
+                                bitmap = capturedImage.value!!.asImageBitmap(),
+                                contentDescription = "Captured Photo",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(2.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            //if a picture has been taken
+                            if (detectedFaces.isNotEmpty() && detectedFacesMesh.isNotEmpty()) {
+                                Log.d("Test", "Attempted to Draw Graphic")
+
+                                //draws specific face graphic on canvas
+                                //TODO: fix incorrect scaling/misplacement
+                                Canvas(modifier = Modifier.fillMaxSize()) {
+
+                                    if (selected != "none" || selected != "") {
+                                        if (selected == "cd") {
+
+                                        } else {
+
+                                        }
+                                        val f = FaceGraphic(
+                                            detectedFaces[0],
+                                            capturedImage.value!!.width,
+                                            size.width
+                                        )
+                                        f.setDrawBool(rememberBool)
+                                        f.draw(drawContext.canvas.nativeCanvas)
+
+                                        if (selected == "md") {
+                                            val g = FaceMeshGraphic(
+                                                detectedFacesMesh[0],
+                                                capturedImage.value!!.width,
+                                                size.width
+                                            )
+                                            g.draw(drawContext.canvas.nativeCanvas)
+                                        }
+                                    }
+                                }
+                            }
+
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(500.dp)
+                            ) {
+                                CameraPreview(
+                                    controller = controller,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                )
+
+                                IconButton(
+                                    onClick = {
+                                        lensFacing =
+                                            if (lensFacing == CameraSelector.LENS_FACING_BACK) {
+                                                CameraSelector.LENS_FACING_FRONT
+                                            } else {
+                                                CameraSelector.LENS_FACING_BACK
+                                            }
+                                    },
+                                    modifier = Modifier
+                                        .align(Alignment.TopStart)
+                                        .padding(30.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Refresh,
+                                        contentDescription = "Flip Camera"
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(
+                        modifier = Modifier
+                            .height(50.dp)
+                    )
+
+                    if (loading) {
+                        Text("Loading...", fontSize = 20.sp)
+                    }
+                    if (capturedImage.value == null) {
+                        Button(
+                            modifier = Modifier
+                                .width(400.dp)
+                                .padding(vertical = 8.dp),
+                            onClick = {
+                                loading = true
+
+                                setSelected("fd")
+                                takePhoto(
+                                    context = context,
+                                    controller = controller,
+                                    onPhotoTaken = { bitmap ->
+                                        capturedImage.value = bitmap
+                                    })
+
+                            },
+                            shape = RoundedCornerShape(1.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xff9910e3),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Verify Humanity", fontSize = 20.sp)
+                        }
+                    }
+                    Spacer(
+                        modifier = Modifier
+                            .height(10.dp)
+                    )
 
 
-        if(detectedFaces.isNotEmpty()){
-            Button(
-                modifier = Modifier
-                    .width(400.dp)
-                    .padding(vertical = 8.dp),
-                onClick = {
-                    navController.navigate("signup")
-                },
-                shape = RoundedCornerShape(1.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xff9910e3),
-                    contentColor = Color.White
-                )
-            ){
-                Text("Continue", fontSize = 20.sp)
-            }
-        } else if (capturedImage.value != null && detectedFaces.isEmpty() && !loading){
-            Button(
-                modifier = Modifier
-                    .width(400.dp)
-                    .padding(vertical = 8.dp),
-                onClick = {
-                    capturedImage.value = null
-                },
-                shape = RoundedCornerShape(1.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xff9910e3),
-                    contentColor = Color.White
-                )
-            ){
-                Text("Try Again", fontSize = 20.sp)
+                    if (detectedFaces.isNotEmpty()) {
+                        Button(
+                            modifier = Modifier
+                                .width(400.dp)
+                                .padding(vertical = 8.dp),
+                            onClick = {
+                                navController.navigate("signup")
+                            },
+                            shape = RoundedCornerShape(1.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xff9910e3),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Continue", fontSize = 20.sp)
+                        }
+                    } else if (capturedImage.value != null && detectedFaces.isEmpty() && !loading) {
+                        Button(
+                            modifier = Modifier
+                                .width(400.dp)
+                                .padding(vertical = 8.dp),
+                            onClick = {
+                                capturedImage.value = null
+                            },
+                            shape = RoundedCornerShape(1.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xff9910e3),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Try Again", fontSize = 20.sp)
+                        }
+                    }
+                }
             }
         }
 //        Row(
