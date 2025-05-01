@@ -29,6 +29,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import com.example.wpigroupfinder.screens.clubowner.ClubListScreenDesign
 import com.example.wpigroupfinder.screens.login.FaceRecogScreenDesign
 import com.example.wpigroupfinder.screens.login.SignupScreenDesign
 import com.example.wpigroupfinder.screens.clubowner.CreateClubScreenDesign
@@ -105,7 +106,9 @@ class MainActivity : ComponentActivity() {
             composable("createClub/{userid}") { backStackEntry ->
                 val userid = backStackEntry.arguments?.getString("userid")
                 CreateClubScreenDesign(navController, userid) }
-
+            composable("club_screen/{userid}") { backStackEntry ->
+                val userid = backStackEntry.arguments?.getString("userid")
+                ClubListScreenDesign(navController, userid) }
             composable("signup") { SignupScreenDesign(navController) }
 
             composable("user/{userid}") { backStackEntry ->
