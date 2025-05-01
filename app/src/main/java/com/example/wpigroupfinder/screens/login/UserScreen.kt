@@ -6,8 +6,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,6 +41,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserScreenDesign(navController: NavController, user_uid: String?) {
     val user_uidInt = user_uid?.toInt()
@@ -40,6 +50,7 @@ fun UserScreenDesign(navController: NavController, user_uid: String?) {
     var profilePic by remember { mutableStateOf("https://wpigroupfinder.s3.us-east-2.amazonaws.com/images/test_pfp.jpg") }
     val steps by GlobalStepCounter.stepCounter.stepCount.collectAsState()
     val clubsList = remember { mutableStateOf<JSONArray?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
     LaunchedEffect("test") {
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
@@ -75,34 +86,65 @@ fun UserScreenDesign(navController: NavController, user_uid: String?) {
                         val joinedClubs = user.optJSONArray("joinedClubs") // returns null if not found
                         clubsList.value = joinedClubs
                         println("User UID: $user_uid")
+                        isLoading = false
                     } else {
                         println("Error: ${it.code}")
+                        isLoading = false
                     }
                 }
             } catch (e: Exception) {
                 println("Exception: ${e.message}")
+                isLoading = false
             }
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            AsyncImage(
-                model = profilePic,
-                contentDescription = "test image"
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Account") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
             )
-            Text("WPI Group Finder User Page")
-            Text("$user_uidInt")
-            Text("$username")
-            //Text("$description")
-            Text("Steps taken today: $steps")
-            Column {
-                Text("Clubs")
+        }
+    ) { innerPadding ->
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            else -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        AsyncImage(
+                            model = profilePic,
+                            contentDescription = "test image"
+                        )
+                        Text("WPI Group Finder User Page")
+                        Text("$user_uidInt")
+                        Text("$username")
+                        //Text("$description")
+                        Text("Steps taken today: $steps")
+                        Column {
+                            Text("Clubs")
 //                clubsList.value.forEach{club ->
 //                    Text(text = club.getString("name"),
 //                        modifier = Modifier.clickable { println(club.getString("club_uid")) })
@@ -110,40 +152,45 @@ fun UserScreenDesign(navController: NavController, user_uid: String?) {
 //                if (clubsList.value?.length() == 0) {
 //                    Text("No clubs currently")
 //                }
-                clubsList.value?.let { jsonArray ->
-                    (0 until jsonArray.length()).forEach { i ->
-                        val club = jsonArray.getJSONObject(i)
-                        // Use club here
-                        Text(text = club.getString("name"),
-                            modifier = Modifier.clickable {
-                                val clubID = club.getString("club_uid")
-                                navController.navigate("clubOwner/${clubID}/${user_uidInt}")
-                            })
+                            clubsList.value?.let { jsonArray ->
+                                (0 until jsonArray.length()).forEach { i ->
+                                    val club = jsonArray.getJSONObject(i)
+                                    // Use club here
+                                    Text(text = club.getString("name"),
+                                        modifier = Modifier.clickable {
+                                            val clubID = club.getString("club_uid")
+                                            navController.navigate("clubOwner/${clubID}/${user_uidInt}")
+                                        })
+                                }
+                            }
+
+                            Button(onClick = {navController.navigate("createClub/${user_uidInt}")}){
+                                Text("Create Club")
+                            }
+                            Spacer(modifier = Modifier
+                                .height(50.dp)
+                            )
+
+
+                            Button(onClick = { navController.navigate("events/${user_uidInt}") }){
+                                Text("To Events")
+                            }
+
+
+
+                            Button(onClick = { navController.navigate("login") }){
+                                Text("Sign Out")
+                            }
+                        }
+
+
+
                     }
-                }
-
-                Button(onClick = {navController.navigate("createClub/${user_uidInt}")}){
-                        Text("Create Club")
-                    }
-                Spacer(modifier = Modifier
-                    .height(50.dp)
-                )
-
-
-                Button(onClick = { navController.navigate("events/${user_uidInt}") }){
-                    Text("To Events")
-                }
-
-
-
-                Button(onClick = { navController.navigate("login") }){
-                    Text("Sign Out")
                 }
             }
-
-
-
         }
     }
+
+
 
 }

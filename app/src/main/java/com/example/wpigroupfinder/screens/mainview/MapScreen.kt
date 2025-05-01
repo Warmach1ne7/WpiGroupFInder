@@ -16,10 +16,19 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Bundle
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,11 +47,14 @@ import com.google.android.gms.tasks.CancellationTokenSource
 
 
 //https://github.com/android/platform-samples/blob/main/samples/location/src/main/java/com/example/platform/location/currentLocation/CurrentLocationScreen.kt
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreenDesign(navController: NavController, userid: String?) {
     val context = LocalContext.current
     val mapV = remember { MapView(context) }
     var googleMapInstance by remember { mutableStateOf<GoogleMap?>(null) }
+
+    var isLoading by remember { mutableStateOf(true) }
 
     val locationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
@@ -75,6 +87,7 @@ fun MapScreenDesign(navController: NavController, userid: String?) {
             googleMap.addMarker(MarkerOptions().position(userLocation).title("You are here"))
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
         }
+        isLoading = false
     }
 
     LaunchedEffect(userLocation) {
@@ -89,35 +102,78 @@ fun MapScreenDesign(navController: NavController, userid: String?) {
         }
     }
 
-    //https://developers.google.com/maps/documentation/android-sdk/map
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(top = 40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally){
-    AndroidView(
-        factory = { mapV },
-        modifier = Modifier.size(300.dp).background(Color.Gray, shape = RoundedCornerShape(8.dp)),
-        update = { map ->
-            map.onCreate(Bundle())
-            map.getMapAsync { googleMap ->
-                googleMapInstance = googleMap
-                googleMap.addMarker(MarkerOptions().position(userLocation).title("Default marker"))
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10f))
-            }
-            map.onResume()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Map") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
         }
-      )
-        Text(
-            text = locationText.value,
-            modifier = Modifier
-                .padding(top = 16.dp),
-            color = Color.Black
-        )
+    ) { innerPadding ->
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
 
-        Button(onClick = {  navController.popBackStack() }) {
-            Text("Back To Events")
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 40.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    AndroidView(
+                        factory = { mapV },
+                        modifier = Modifier
+                            .size(300.dp)
+                            .background(Color.Gray, shape = RoundedCornerShape(8.dp)),
+                        update = { map ->
+                            map.onCreate(Bundle())
+                            map.getMapAsync { googleMap ->
+                                googleMapInstance = googleMap
+                                googleMap.addMarker(
+                                    MarkerOptions().position(userLocation).title("Default marker")
+                                )
+                                googleMap.moveCamera(
+                                    CameraUpdateFactory.newLatLngZoom(
+                                        userLocation,
+                                        10f
+                                    )
+                                )
+                            }
+                            map.onResume()
+                        }
+                    )
+                    Text(
+                        text = locationText.value,
+                        modifier = Modifier
+                            .padding(top = 16.dp),
+                        color = Color.White
+                    )
+
+
+                }
+            }
         }
     }
+
+
+    //https://developers.google.com/maps/documentation/android-sdk/map
+
 
 }
 
