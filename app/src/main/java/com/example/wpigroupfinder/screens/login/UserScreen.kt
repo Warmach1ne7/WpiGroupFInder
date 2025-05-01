@@ -1,5 +1,6 @@
 package com.example.wpigroupfinder.screens.login
 
+import GlobalStepCounter.stepCounter
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,7 +49,8 @@ fun UserScreenDesign(navController: NavController, user_uid: String?) {
     var username by remember{ mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var profilePic by remember { mutableStateOf("https://wpigroupfinder.s3.us-east-2.amazonaws.com/images/test_pfp.jpg") }
-    val steps by GlobalStepCounter.stepCounter.stepCount.collectAsState()
+    val steps by stepCounter.stepCount.collectAsState()
+
     val clubsList = remember { mutableStateOf<JSONArray?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     LaunchedEffect("test") {

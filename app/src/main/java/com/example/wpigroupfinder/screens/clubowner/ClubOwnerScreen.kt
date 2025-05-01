@@ -9,10 +9,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,6 +40,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +55,9 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
     var clubOwnerUid by remember{ mutableIntStateOf(0) }
     var isMember by remember { mutableStateOf(false) }
 
+    val userClubsList = remember { mutableStateOf<JSONArray?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+
     fun setStates(body: JSONObject){
         clubName = body.getString("club_name")
         clubDesc = body.getString("club_desc")
@@ -58,6 +66,15 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
         clubOwnerName = body.getString("leaderName")
         memberNum = body.getInt("members_num")
         isMember = body.getBoolean("isMember")
+    }
+
+    var reloadTrigger = 0
+
+    LaunchedEffect(isMember) {
+        // This will run every time isMember changes
+        if (isMember) {
+            reloadTrigger++ // triggers full page refresh
+        }
     }
 
     LaunchedEffect("test") {
@@ -70,7 +87,8 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
             //println(username)
             val jsonBody = """
             {
-                "club_uid": $clubIdInt
+                "club_uid": $clubIdInt,
+                "user_uid": $userIdInt
             }
         """.trimIndent().toRequestBody(jsonMediaType)
 
@@ -184,7 +202,15 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Club Details") }
+                title = { Text("Club Details") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
             )
         }
     ) { innerPadding ->
@@ -316,14 +342,17 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
                             Text("Leave Club")
                         }
                     }
-                    Button(
-                        onClick = { navController.navigate("create_event/$clubName") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Text("Add Club Event")
+                    if(clubOwnerUid == userIdInt){
+                        Button(
+                            onClick = { navController.navigate("create_event/$clubName") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Text("Add Club Event")
+                        }
                     }
+
                     Button(
                         onClick = { navController.navigate("events/${userIdInt}") },
                         modifier = Modifier
