@@ -24,6 +24,7 @@ import com.example.wpigroupfinder.screens.mainview.VerificationScreenDesign
 import com.example.wpigroupfinder.screens.mainview.ViewClubPageScreenDesign
 import com.example.wpigroupfinder.screens.mainview.ViewEventScreenDesign
 import com.example.wpigroupfinder.ui.theme.WPIGroupFinderTheme
+
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts

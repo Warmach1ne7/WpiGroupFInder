@@ -171,7 +171,15 @@ fun EventsScreenDesign(navController: NavController) {
                 Text("Create Event")
             }
             Button(
-                onClick = { navController.navigate("login") },
+                onClick = { navController.navigate("registered_events") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Registered Events")
+            }
+            Button(
+                onClick = { navController.navigate("home") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
