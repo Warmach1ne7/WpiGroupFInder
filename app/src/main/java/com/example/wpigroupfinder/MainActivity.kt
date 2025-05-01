@@ -128,7 +128,7 @@ class MainActivity : ComponentActivity() {
 
             composable("events"){ EventsScreenDesign(navController) }
             composable(
-                "event/{eventId}",
+                "eventDetails/{eventId}",
                 arguments = listOf(navArgument("eventId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val eventId = backStackEntry.arguments?.getInt("eventId")

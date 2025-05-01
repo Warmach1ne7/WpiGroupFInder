@@ -92,6 +92,8 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
+    implementation ("com.google.code.gson:gson:2.8.9")
+
     // CameraX core library
     implementation("androidx.camera:camera-core:1.4.2")
 
@@ -102,6 +104,5 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.4.2")
     implementation("androidx.camera:camera-view:1.4.2")
     implementation("androidx.camera:camera-extensions:1.4.2")
-   
 
 }

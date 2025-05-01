@@ -1,6 +1,7 @@
 package com.example.wpigroupfinder.screens.events
 
 import android.app.TimePickerDialog
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -11,6 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.wpigroupfinder.data.model.Event
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -31,10 +40,71 @@ fun CreateEventScreenDesign(navController: NavController) {
     var location by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var showSuccess by remember { mutableStateOf(false) }
-
+    var showError by remember { mutableStateOf<String?>(null) }
+    val userId = 100
+    var createdBy by remember { mutableStateOf<Int?>(null) }
+    var clubId by remember { mutableStateOf("") }
     val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
     val timeFormatter = DateTimeFormatter.ofPattern("hh:mm a")
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    var latitude by remember { mutableStateOf<Double?>(null) }
+    var longitude by remember { mutableStateOf<Double?>(null) }
+    var showMapDialog by remember { mutableStateOf(false) }
+
+    fun createEventRequest() {
+        // Validate all required fields
+        if (title.isBlank() || location.isBlank() || date == null || startTime == null || endTime == null) {
+            showError = "Please fill in all required fields."
+            return
+        }
+
+        coroutineScope.launch(Dispatchers.IO) {
+            val client = OkHttpClient()
+            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/createEvent"
+
+            // Format date and times as strings
+            val formattedDate = date?.let { DateTimeFormatter.ISO_LOCAL_DATE.format(it) } ?: ""
+            val formattedStartTime = startTime?.let { DateTimeFormatter.ofPattern("HH:mm").format(it) } ?: ""
+            val formattedEndTime = endTime?.let { DateTimeFormatter.ofPattern("HH:mm").format(it) } ?: ""
+
+            // Create the event object
+            val event = Event(
+                title = title,
+                description = description,
+                location = location,
+                date = formattedDate,
+                startTime = formattedStartTime,
+                endTime = formattedEndTime,
+                clubId = userId,
+                createdBy = userId
+            )
+
+            // Convert to JSON
+            val gson = Gson()
+            val jsonBody = gson.toJson(event).toRequestBody("application/json; charset=utf-8".toMediaType())
+
+            val request = Request.Builder()
+                .url(url)
+                .post(jsonBody)
+                .build()
+
+            try {
+                val response = client.newCall(request).execute()
+                val responseBody = response.body?.string()
+                if (response.isSuccessful) {
+                    showSuccess = true
+                    showError = null
+                } else {
+                    showError = "Error code: ${response.code}, body: $responseBody"
+                    Log.e("MyAppDB", "Error code: ${response.code}, body: $responseBody")
+                }
+            } catch (e: Exception) {
+                showError = "Exception: ${e.localizedMessage}"
+                Log.e("MyAppDB", "Exception occurred: ${e.localizedMessage}", e)
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -169,6 +239,12 @@ fun CreateEventScreenDesign(navController: NavController) {
                 label = { Text("Location") },
                 modifier = Modifier.fillMaxWidth()
             )
+            OutlinedTextField(//TODO ADD CLUB DROP DOWN TO GET CLUB ID
+                value = clubId,
+                onValueChange = { clubId = it },
+                label = { Text("Club") },
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedTextField(
                 value = description,
@@ -182,10 +258,7 @@ fun CreateEventScreenDesign(navController: NavController) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = {
-                    // Here you'd add logic to create/save the event
-                    showSuccess = true
-                },
+                onClick = { createEventRequest() },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = title.isNotBlank() && date != null && startTime != null && endTime != null && location.isNotBlank()
             ) {
@@ -202,6 +275,14 @@ fun CreateEventScreenDesign(navController: NavController) {
                     kotlinx.coroutines.delay(1000)
                     navController.popBackStack()
                 }
+            }
+
+            if (showError != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = showError ?: "",
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         }
     }
