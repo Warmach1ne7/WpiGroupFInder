@@ -164,14 +164,6 @@ fun EventsScreenDesign(navController: NavController, user_uid: String?) {
                 }
             }
             Button(
-                onClick = { navController.navigate("map/${user_uid}") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text("Create Event")
-            }
-            Button(
                 onClick = { navController.navigate("registered_events/${user_uid}") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -179,14 +171,16 @@ fun EventsScreenDesign(navController: NavController, user_uid: String?) {
             ) {
                 Text("Registered Events")
             }
+
             Button(
-                onClick = { navController.navigate("home") },
+                onClick = { navController.navigate("map/${user_uid}") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                Text("Go to Home")
+                Text("Map")
             }
+
         }
     }
 }

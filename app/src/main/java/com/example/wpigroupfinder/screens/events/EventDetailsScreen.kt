@@ -35,6 +35,7 @@ fun EventDetailsScreenDesign(navController: NavController, eventId: String?, use
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showRegisterDialog by remember { mutableStateOf(false) }
+    var showUnregisterDialog by remember { mutableStateOf(false) }
     var registrationResult by remember { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -118,14 +119,14 @@ fun EventDetailsScreenDesign(navController: NavController, eventId: String?, use
                         text = event!!.description,
                         style = MaterialTheme.typography.bodyMedium
                     )
+
                     Button(
-                        onClick = { showRegisterDialog = true },
-                        enabled = !alreadyRegistered, // Disable if already registered
+                        onClick = { if (alreadyRegistered) {showUnregisterDialog = true} else {showRegisterDialog = true} },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 24.dp)
                     ) {
-                        Text(if (alreadyRegistered) "Registered" else "Register for Event")
+                        Text(if (alreadyRegistered) "Unregister" else "Register")
                     }
 
 
@@ -169,6 +170,37 @@ fun EventDetailsScreenDesign(navController: NavController, eventId: String?, use
                 dismissButton = {
                     TextButton(
                         onClick = { showRegisterDialog = false }
+                    ) { Text("No") }
+                }
+            )
+        }
+        if (showUnregisterDialog) {
+            AlertDialog(
+                onDismissRequest = { showUnregisterDialog = false },
+                title = { Text("unregister for Event") },
+                text = { Text("Are you sure you want to unregister for this event?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showUnregisterDialog = false
+                            if (event != null) {
+                                if (eventId != null && userId!= null) {
+                                    unregisterForEvent(eventId.toInt(), userId = userId.toInt(), snackbarHostState, navController) { result ->
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar(result)
+                                            if (result == "deregistration successful") {
+                                                navController.popBackStack()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ) { Text("Yes") }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showUnregisterDialog = false }
                     ) { Text("No") }
                 }
             )
@@ -271,6 +303,56 @@ fun registerForEvent(
         }
     }
 }
+
+fun unregisterForEvent(
+    eventId: Int,
+    userId: Int,
+    snackbarHostState: SnackbarHostState,
+    navController: NavController,
+    onResult: (String) -> Unit
+) {
+    val client = OkHttpClient()
+    val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/unregisterEvent"
+    val jsonBody = """
+        {
+            "event_id": $eventId,
+            "userId": $userId
+        }
+    """.trimIndent()
+    val requestBody = jsonBody.toRequestBody("application/json; charset=utf-8".toMediaType())
+
+    // Use the Composable's coroutine scope
+    CoroutineScope(Dispatchers.Main).launch {
+        try {
+            val response = withContext(Dispatchers.IO) {
+                client.newCall(
+                    Request.Builder()
+                        .url(url)
+                        .post(requestBody)
+                        .build()
+                ).execute()
+            }
+
+            val responseBody = response.body?.string()
+            if (response.isSuccessful) {
+                // Show snackbar and navigate back
+                snackbarHostState.showSnackbar(
+                    "Unregistered from event",
+                    duration = SnackbarDuration.Short
+                )
+                // Wait for snackbar to complete before navigating
+                delay(1500)
+                navController.popBackStack()
+            } else {
+                onResult("unregistration failed: ${response.code} - $responseBody")
+            }
+        } catch (e: Exception) {
+            onResult("Error: ${e.localizedMessage}")
+        }
+    }
+}
+
+
 suspend fun isUserRegistered(eventId: Int, userId: Int): Boolean = withContext(Dispatchers.IO) {
     val client = OkHttpClient()
     val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/checkEventRegistration"
