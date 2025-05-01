@@ -91,14 +91,15 @@ fun UserScreenDesign(navController: NavController, user_uid: String?) {
                 contentDescription = "test image"
             )
             Text("WPI Group Finder User Page")
-            //Text("$user_uidInt")
+            Text("$user_uidInt")
             Text("$username")
             //Text("$description")
             Text("Steps taken today: $steps")
             Column {
+                Text("Clubs")
                 clubsList.forEach{club ->
                     Text(text = club.getString("name"),
-                        modifier = Modifier.clickable { println() })
+                        modifier = Modifier.clickable { println(club.getString("club_uid")) })
                 }
             }
             Button(onClick = { navController.navigate("login") }){

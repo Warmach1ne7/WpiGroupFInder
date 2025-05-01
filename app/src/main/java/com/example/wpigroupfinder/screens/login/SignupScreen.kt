@@ -127,13 +127,8 @@ fun SignupScreenDesign(navController: NavController) {
             Button(onClick = {createUserRequest()}){
                 Text("Make user (no recog yet)")
             }
-            Button(onClick = { navController.navigate("login") }){
+            Button(onClick = { navController.navigate("login") }) {
                 Text("Sign In")
-            }
-            Button(
-                onClick = {}
-            ){
-                Text("Back")
             }
         }
     }

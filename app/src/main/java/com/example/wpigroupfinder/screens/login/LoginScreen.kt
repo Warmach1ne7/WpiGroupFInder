@@ -17,6 +17,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -53,9 +54,16 @@ fun LoginScreenDesign(navController: NavController) {
             try {
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
-                    println("Success: ${JSONObject(response.body?.string())}")
-                    user_uid = JSONObject(response.body?.string()).getString("user_uid").toInt()
-                    navController.navigate("user/${user_uid}")
+                    val responseBodyString = response.body?.string()
+                    println(responseBodyString)
+                    val jsonObject = JSONObject(responseBodyString)
+                    val body = jsonObject.getJSONObject("body")
+                    val user = body.getJSONObject("user")
+
+                    withContext(Dispatchers.Main) {
+                        user_uid = user.getString("user_uid").toInt()
+                        navController.navigate("user/${user_uid}")
+                    }
                 } else {
                     println("Error: ${response.code}")
                 }
@@ -84,7 +92,7 @@ fun LoginScreenDesign(navController: NavController) {
                 onValueChange = { password = it },
                 label = { Text("Password") }
             )
-            Button(onClick = { signInRequest() }) { //TODO change this
+            Button(onClick = { signInRequest() }) {
                 Text("Login")
             }
             Button(onClick = { navController.navigate("faceRecog") }) {
@@ -96,6 +104,10 @@ fun LoginScreenDesign(navController: NavController) {
 
             Button(onClick = { navController.navigate("events") }) {
                 Text("Go to events")
+            }
+
+            Button({navController.navigate("signup")}){
+                Text("make user")
             }
 
             Button(onClick = { navController.navigate("map") }) {
