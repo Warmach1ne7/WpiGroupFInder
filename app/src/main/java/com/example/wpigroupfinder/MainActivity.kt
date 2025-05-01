@@ -24,6 +24,7 @@ import com.example.wpigroupfinder.screens.mainview.VerificationScreenDesign
 import com.example.wpigroupfinder.screens.mainview.ViewClubPageScreenDesign
 import com.example.wpigroupfinder.screens.mainview.ViewEventScreenDesign
 import com.example.wpigroupfinder.ui.theme.WPIGroupFinderTheme
+
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,6 +32,7 @@ import androidx.core.content.ContextCompat
 import com.example.wpigroupfinder.screens.login.FaceRecogScreenDesign
 import com.example.wpigroupfinder.screens.login.SignupScreenDesign
 import com.example.wpigroupfinder.screens.clubowner.CreateClubScreenDesign
+import com.example.wpigroupfinder.screens.events.RegisteredEventsScreenDesign
 import com.example.wpigroupfinder.screens.login.UserScreenDesign
 
 
@@ -130,12 +132,21 @@ class MainActivity : ComponentActivity() {
                 val userid = backStackEntry.arguments?.getString("userid")
                 EventsScreenDesign(navController, userid)
             }
+            composable("registered_events") { backStackEntry ->
+                val userid = backStackEntry.arguments?.getString("userid")
+                RegisteredEventsScreenDesign(navController, "7") }//TODO
+            composable("events"){ EventsScreenDesign(navController) }
+            // In your NavHost/NavGraph setup
             composable(
-                "eventDetails/{eventId}",
-                arguments = listOf(navArgument("eventId") { type = NavType.IntType })
+                "eventDetails/{eventId}/{userId}",
+                arguments = listOf(
+                    navArgument("eventId") { type = NavType.IntType },
+                    navArgument("userId") { type = NavType.IntType }
+                )
             ) { backStackEntry ->
                 val eventId = backStackEntry.arguments?.getInt("eventId")
-                EventDetailsScreenDesign(navController, eventId)
+                val userId = backStackEntry.arguments?.getInt("userId")
+                EventDetailsScreenDesign(navController, eventId, 7)//TODO
             }
             composable("create_event") { CreateEventScreenDesign(navController, null) }
             composable("create_event/{clubName}")
