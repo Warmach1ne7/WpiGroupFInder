@@ -316,7 +316,7 @@ fun unregisterForEvent(
     val jsonBody = """
         {
             "event_id": $eventId,
-            "userId": $userId
+            "user_uid": $userId
         }
     """.trimIndent()
     val requestBody = jsonBody.toRequestBody("application/json; charset=utf-8".toMediaType())
