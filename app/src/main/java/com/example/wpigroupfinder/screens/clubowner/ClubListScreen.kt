@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -65,9 +66,12 @@ fun ClubListScreenDesign(navController: NavController, user_uid: String?) {
         topBar = {
             TopAppBar(
                 title = { Text("Clubs List") },
-                actions = {
-                    IconButton(onClick = { navController.navigate("user/${user_uid}") }, modifier = Modifier.size(65.dp)) {
-                        Icon(Icons.Default.AccountCircle, contentDescription = "Account")
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
                 }
             )
@@ -101,30 +105,7 @@ fun ClubListScreenDesign(navController: NavController, user_uid: String?) {
                     }
                 }
             }
-            Button(
-                onClick = { navController.navigate("events/${user_uid}") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text("Events")
-            }
-            Button(
-                onClick = { navController.navigate("registered_events/${user_uid}") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text("Registered Events")
-            }
-            Button(
-                onClick = { navController.navigate("map/${user_uid}") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text("Map")
-            }
+
         }
     }
 }
