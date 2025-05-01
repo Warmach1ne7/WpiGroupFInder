@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateEventScreenDesign(navController: NavController) {
+fun CreateEventScreenDesign(navController: NavController, clubName: String?) {
     // State holders for form fields
     var title by remember { mutableStateOf("") }
     var date by remember { mutableStateOf<LocalDate?>(null) }
@@ -239,10 +239,15 @@ fun CreateEventScreenDesign(navController: NavController) {
                 label = { Text("Location") },
                 modifier = Modifier.fillMaxWidth()
             )
+            var clubNameActual = "Independent Event"
+            if(clubName != null){
+                clubNameActual = clubName
+            }
             OutlinedTextField(//TODO ADD CLUB DROP DOWN TO GET CLUB ID
                 value = clubId,
                 onValueChange = { clubId = it },
-                label = { Text("Club") },
+                readOnly = true,
+                label = { Text(clubNameActual) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(12.dp))

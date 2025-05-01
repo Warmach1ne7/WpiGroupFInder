@@ -116,6 +116,9 @@ fun CreateClubScreenDesign(navController: NavController, userid: String?) {
             Button(onClick = { createClubRequest() }){
                 Text("Create Club")
             }
+            Button(onClick = { navController.popBackStack() }){
+                Text("Back")
+            }
         }
     }
 }

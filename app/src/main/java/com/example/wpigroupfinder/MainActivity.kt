@@ -137,7 +137,12 @@ class MainActivity : ComponentActivity() {
                 val eventId = backStackEntry.arguments?.getInt("eventId")
                 EventDetailsScreenDesign(navController, eventId)
             }
-            composable("create_event") { CreateEventScreenDesign(navController) }
+            composable("create_event") { CreateEventScreenDesign(navController, null) }
+            composable("create_event/{clubName}")
+                { backStackEntry ->
+                val clubName = backStackEntry.arguments?.getString("clubName")
+                CreateEventScreenDesign(navController, clubName )
+            }
             composable("faceRecog") { FaceRecogScreenDesign(navController) }
         }
     }

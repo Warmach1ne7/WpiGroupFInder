@@ -114,7 +114,7 @@ fun MapScreenDesign(navController: NavController, userid: String?) {
             color = Color.Black
         )
 
-        Button(onClick = { navController.navigate("events/${userid}") }) {
+        Button(onClick = {  navController.popBackStack() }) {
             Text("Back To Events")
         }
     }

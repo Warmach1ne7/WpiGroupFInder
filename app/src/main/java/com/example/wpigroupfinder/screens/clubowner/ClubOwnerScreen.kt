@@ -183,7 +183,7 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
                 Text("Number of Members")
                 Text("$memberNum")
 
-                Button(onClick = { navController.navigate("eventFeed") }) {
+                Button(onClick = { navController.navigate("user/${userIdInt}") }) {
                     Text("Back")
                 }
 
@@ -201,8 +201,8 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
                         Text("Leave Club")
                     }
                 }
-                Button(onClick = { navController.navigate("clubEvents/$clubIdInt") }) {
-                    Text("Club Events")
+                Button(onClick = { navController.navigate("create_event/${clubName}") }) {
+                    Text("Add Club Event")
                 }
             }
         }
