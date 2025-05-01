@@ -1,5 +1,8 @@
 package com.example.wpigroupfinder
 
+import GlobalStepCounter
+import StepCounter
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -65,6 +68,8 @@ class MainActivity : ComponentActivity() {
             Log.d("Permission", "Launching permissions request. . .")
             allPermissionsLauncher.launch(ALL_PERMISSIONS)
         }
+
+        GlobalStepCounter.init(this)
 
         enableEdgeToEdge()
         setContent {

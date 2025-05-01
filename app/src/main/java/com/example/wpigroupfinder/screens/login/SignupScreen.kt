@@ -123,6 +123,10 @@ fun SignupScreenDesign(navController: NavController) {
             Button(onClick = { navController.navigate("faceRecog") }){
                 Text("Create User")
             }
+
+            Button(onClick = {createUserRequest()}){
+                Text("Make user (no recog yet)")
+            }
             Button(onClick = { navController.navigate("login") }){
                 Text("Sign In")
             }

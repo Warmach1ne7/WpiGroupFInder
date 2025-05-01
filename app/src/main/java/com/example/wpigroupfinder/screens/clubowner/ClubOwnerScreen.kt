@@ -49,7 +49,7 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
 
-            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/viewClub" //TODO: switch url
+            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/viewClub"
 
             val jsonMediaType = "application/json; charset=utf-8".toMediaType()
             //println(username)
@@ -89,7 +89,7 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
 
-            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/joinClub" //TODO: switch url
+            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/joinClub"
 
             val jsonMediaType = "application/json; charset=utf-8".toMediaType()
             //println(username)
@@ -130,7 +130,7 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
 
-            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/leaveClub" //TODO: switch url
+            val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/leaveClub"
 
             val jsonMediaType = "application/json; charset=utf-8".toMediaType()
             //println(username)
@@ -187,8 +187,8 @@ fun ClubOwnerScreenDesign(navController: NavController, clubid: String, userid: 
                     Text("Back")
                 }
 
-                if (clubOwnerUid == userIdInt) { //put in if club owner, this is viewable
-                    Button(onClick = { navController.navigate("editClubPage") }) {
+                if (clubOwnerUid == userIdInt) {
+                    Button(onClick = { navController.navigate("editClub/${clubIdInt}/${userIdInt}") }) {
                         Text("Edit Club Page")
                     }
                 } else if (!isMember){

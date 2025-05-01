@@ -79,10 +79,10 @@ fun FaceRecogScreenDesign(navController: NavController) {
             setEnabledUseCases(CameraController.IMAGE_CAPTURE)
         }
     }
-    // 👇 This controls the lens (front vs back)
+    // This controls the lens (front vs back)
     var lensFacing by remember { mutableStateOf(CameraSelector.LENS_FACING_FRONT) }
 
-    // 👀 Watch lensFacing and rebind camera
+    // Watch lensFacing and rebind camera
     LaunchedEffect(lensFacing) {
         controller.cameraSelector = CameraSelector.Builder()
             .requireLensFacing(lensFacing)

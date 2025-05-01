@@ -55,6 +55,7 @@ fun LoginScreenDesign(navController: NavController) {
                 if (response.isSuccessful) {
                     println("Success: ${JSONObject(response.body?.string())}")
                     user_uid = JSONObject(response.body?.string()).getString("user_uid").toInt()
+                    navController.navigate("user/${user_uid}")
                 } else {
                     println("Error: ${response.code}")
                 }

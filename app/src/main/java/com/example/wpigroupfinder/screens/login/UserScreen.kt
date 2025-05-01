@@ -34,6 +34,7 @@ fun UserScreenDesign(navController: NavController, user_uid: String?) {
     var username by remember{ mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var profilePic by remember { mutableStateOf("https://wpigroupfinder.s3.us-east-2.amazonaws.com/images/test_pfp.jpg") }
+    val steps by GlobalStepCounter.stepCounter.stepCount.collectAsState()
     var clubsList = remember { mutableStateListOf<JSONObject>() }
     LaunchedEffect("test") {
         CoroutineScope(Dispatchers.IO).launch {
@@ -85,23 +86,27 @@ fun UserScreenDesign(navController: NavController, user_uid: String?) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Text("WPI Group Finder User Page")
-            Text("$user_uidInt")
-            Text("$username")
-            Text("$description")
             AsyncImage(
                 model = profilePic,
                 contentDescription = "test image"
             )
+            Text("WPI Group Finder User Page")
+            //Text("$user_uidInt")
+            Text("$username")
+            //Text("$description")
+            Text("Steps taken today: $steps")
             Column {
                 clubsList.forEach{club ->
                     Text(text = club.getString("name"),
-                        modifier = Modifier.clickable { println("TODO: clickable") })
+                        modifier = Modifier.clickable { println() })
                 }
             }
             Button(onClick = { navController.navigate("login") }){
                 Text("Sign Out")
+            }
+
+            Button(onClick = {navController.navigate("createClub/${user_uidInt}")}){
+                Text("Create Club")
             }
 
         }
