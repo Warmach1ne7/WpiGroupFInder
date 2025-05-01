@@ -33,6 +33,7 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -81,7 +82,9 @@ fun CreateClubScreenDesign(navController: NavController, userid: String?) {
                         val topLevel = JSONObject(bodyString)
                         val body = topLevel.getJSONObject("body")
                         val club_uid = body.getString("club_uid")
-                        navController.navigate("clubOwner/$club_uid/$user_uidInt")
+                        withContext(Dispatchers.Main) {
+                            navController.navigate("clubOwner/$club_uid/$user_uidInt")
+                        }
                     } else {
                         println("Error: ${it.code}")
                     }

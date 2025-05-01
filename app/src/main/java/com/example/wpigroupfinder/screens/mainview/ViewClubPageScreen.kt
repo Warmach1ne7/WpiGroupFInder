@@ -26,6 +26,8 @@ fun ViewClubPageScreenDesign(navController: NavController) {
                 Text("Back To Event")
             }
 
+
+
         }
     }
 

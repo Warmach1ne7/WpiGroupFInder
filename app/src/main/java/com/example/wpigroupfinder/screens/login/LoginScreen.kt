@@ -62,7 +62,7 @@ fun LoginScreenDesign(navController: NavController) {
 
                     withContext(Dispatchers.Main) {
                         user_uid = user.getString("user_uid").toInt()
-                        navController.navigate("user/${user_uid}")
+                        navController.navigate("events/${user_uid}")
                     }
                 } else {
                     println("Error: ${response.code}")
@@ -97,21 +97,6 @@ fun LoginScreenDesign(navController: NavController) {
             }
             Button(onClick = { navController.navigate("faceRecog") }) {
                 Text("Sign Up")
-            }
-            Button(onClick = { navController.navigate("user/3") }) {
-                Text("View User")
-            }
-
-            Button(onClick = { navController.navigate("events") }) {
-                Text("Go to events")
-            }
-
-            Button({navController.navigate("signup")}){
-                Text("make user")
-            }
-
-            Button(onClick = { navController.navigate("map") }) {
-                Text("View Map")
             }
 
 

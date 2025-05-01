@@ -1,8 +1,6 @@
 package com.example.wpigroupfinder
 
 import GlobalStepCounter
-import StepCounter
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,7 +16,6 @@ import com.example.wpigroupfinder.screens.clubowner.ClubOwnerScreenDesign
 import com.example.wpigroupfinder.screens.clubowner.EditClubPageScreenDesign
 import com.example.wpigroupfinder.screens.clubowner.EditEventScreenDesign
 import com.example.wpigroupfinder.screens.events.CreateEventScreenDesign
-import com.example.wpigroupfinder.screens.events.DetailsScreenDesign
 import com.example.wpigroupfinder.screens.events.EventDetailsScreenDesign
 import com.example.wpigroupfinder.screens.events.EventsScreenDesign
 import com.example.wpigroupfinder.screens.login.LoginScreenDesign
@@ -34,7 +31,6 @@ import androidx.core.content.ContextCompat
 import com.example.wpigroupfinder.screens.login.FaceRecogScreenDesign
 import com.example.wpigroupfinder.screens.login.SignupScreenDesign
 import com.example.wpigroupfinder.screens.clubowner.CreateClubScreenDesign
-import com.example.wpigroupfinder.screens.login.SignupScreenDesign
 import com.example.wpigroupfinder.screens.login.UserScreenDesign
 
 
@@ -115,7 +111,10 @@ class MainActivity : ComponentActivity() {
                 UserScreenDesign(navController, userid) }
 
             //all visible
-            composable("map") { MapScreenDesign(navController) }
+            composable("map/{userid}") {
+                    backStackEntry ->
+                val userid = backStackEntry.arguments?.getString("userid")
+                MapScreenDesign(navController, userid) }
             composable(
                 route = "viewEvent/{eventId}",
                 arguments = listOf(navArgument("eventId") { type = NavType.IntType })
@@ -126,7 +125,11 @@ class MainActivity : ComponentActivity() {
             composable("viewClubPage") { ViewClubPageScreenDesign(navController) } //will need extra args
             composable("verification") { VerificationScreenDesign(navController) } //will need extra args
 
-            composable("events"){ EventsScreenDesign(navController) }
+            composable("events/{userid}"){
+                backStackEntry ->
+                val userid = backStackEntry.arguments?.getString("userid")
+                EventsScreenDesign(navController, userid)
+            }
             composable(
                 "eventDetails/{eventId}",
                 arguments = listOf(navArgument("eventId") { type = NavType.IntType })

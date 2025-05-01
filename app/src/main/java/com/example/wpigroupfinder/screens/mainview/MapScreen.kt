@@ -1,11 +1,7 @@
 package com.example.wpigroupfinder.screens.mainview
 
-import android.content.Context
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,15 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.navigation.NavController
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.RequestBody
-import org.json.JSONObject
 
 import kotlinx.coroutines.tasks.await
 import android.content.pm.PackageManager
@@ -32,6 +19,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,7 +39,7 @@ import com.google.android.gms.tasks.CancellationTokenSource
 
 //https://github.com/android/platform-samples/blob/main/samples/location/src/main/java/com/example/platform/location/currentLocation/CurrentLocationScreen.kt
 @Composable
-fun MapScreenDesign(navController: NavController) {
+fun MapScreenDesign(navController: NavController, userid: String?) {
     val context = LocalContext.current
     val mapV = remember { MapView(context) }
     var googleMapInstance by remember { mutableStateOf<GoogleMap?>(null) }
@@ -125,6 +113,10 @@ fun MapScreenDesign(navController: NavController) {
                 .padding(top = 16.dp),
             color = Color.Black
         )
+
+        Button(onClick = { navController.navigate("events/${userid}") }) {
+            Text("Back To Events")
+        }
     }
 
 }

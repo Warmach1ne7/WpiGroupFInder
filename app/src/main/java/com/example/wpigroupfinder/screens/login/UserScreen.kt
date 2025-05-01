@@ -106,6 +106,10 @@ fun UserScreenDesign(navController: NavController, user_uid: String?) {
                 Text("Sign Out")
             }
 
+            Button(onClick = { navController.navigate("events/${user_uidInt}") }){
+                Text("To Events")
+            }
+
             Button(onClick = {navController.navigate("createClub/${user_uidInt}")}){
                 Text("Create Club")
             }

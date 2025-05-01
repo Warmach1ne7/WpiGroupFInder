@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -103,7 +104,7 @@ fun EventListItem(event: Event, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventsScreenDesign(navController: NavController) {
+fun EventsScreenDesign(navController: NavController, user_uid: String?) {
     var events by remember { mutableStateOf<List<Event>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -127,8 +128,8 @@ fun EventsScreenDesign(navController: NavController) {
             TopAppBar(
                 title = { Text("Events List") },
                 actions = {
-                    IconButton(onClick = { navController.navigate("create_event") }, modifier = Modifier.size(65.dp)) {
-                        Icon(Icons.Default.Add, contentDescription = "Create Event")
+                    IconButton(onClick = { navController.navigate("user/${user_uid}") }, modifier = Modifier.size(65.dp)) {
+                        Icon(Icons.Default.AccountCircle, contentDescription = "Account")
                     }
                 }
             )
@@ -163,20 +164,12 @@ fun EventsScreenDesign(navController: NavController) {
                 }
             }
             Button(
-                onClick = { navController.navigate("create_event") },
+                onClick = { navController.navigate("map/${user_uid}") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text("Create Event")
-            }
-            Button(
-                onClick = { navController.navigate("login") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text("Go to Home")
+                Text("Go to map")
             }
         }
     }
