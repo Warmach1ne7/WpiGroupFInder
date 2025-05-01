@@ -30,7 +30,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventDetailsScreenDesign(navController: NavController, eventId: Int?, userId: Int?) {
+fun EventDetailsScreenDesign(navController: NavController, eventId: String?, userId: String?) {
     var event by remember { mutableStateOf<Event?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -44,8 +44,8 @@ fun EventDetailsScreenDesign(navController: NavController, eventId: Int?, userId
     LaunchedEffect(eventId) {
         if (eventId != null) {
             try {
-                event = getEventRequest(eventId)
-                alreadyRegistered = isUserRegistered(eventId, userId!!)
+                event = getEventRequest(eventId.toInt())
+                alreadyRegistered = isUserRegistered(eventId.toInt(), userId!!.toInt())
                 errorMessage = null
             } catch (e: Exception) {
                 errorMessage = "Failed to load event: ${e.localizedMessage}"
@@ -152,8 +152,8 @@ fun EventDetailsScreenDesign(navController: NavController, eventId: Int?, userId
                         onClick = {
                             showRegisterDialog = false
                             if (event != null) {
-                                if (eventId != null) {
-                                    registerForEvent(eventId, userId = 7, snackbarHostState, navController/* TODO your user id */) { result ->
+                                if (eventId != null && userId!= null) {
+                                    registerForEvent(eventId.toInt(), userId = userId.toInt(), snackbarHostState, navController) { result ->
                                         coroutineScope.launch {
                                             snackbarHostState.showSnackbar(result)
                                             if (result == "Registration successful!") {

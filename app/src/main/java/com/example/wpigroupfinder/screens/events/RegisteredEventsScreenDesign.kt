@@ -88,7 +88,7 @@ fun RegisteredEventsScreenDesign(navController: NavController, userId: String?) 
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp)
-                                .clickable { navController.navigate("eventDetails/${event.id}") }
+                                .clickable { navController.navigate("eventDetails/${event.id}/${userId}") }
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(event.title, style = MaterialTheme.typography.titleMedium)

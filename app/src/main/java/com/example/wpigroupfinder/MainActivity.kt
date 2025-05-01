@@ -132,21 +132,16 @@ class MainActivity : ComponentActivity() {
                 val userid = backStackEntry.arguments?.getString("userid")
                 EventsScreenDesign(navController, userid)
             }
-            composable("registered_events") { backStackEntry ->
+            composable("registered_events/{userid}") { backStackEntry ->
                 val userid = backStackEntry.arguments?.getString("userid")
-                RegisteredEventsScreenDesign(navController, "7") }//TODO
-            composable("events"){ EventsScreenDesign(navController) }
+                RegisteredEventsScreenDesign(navController, userid) }
             // In your NavHost/NavGraph setup
             composable(
-                "eventDetails/{eventId}/{userId}",
-                arguments = listOf(
-                    navArgument("eventId") { type = NavType.IntType },
-                    navArgument("userId") { type = NavType.IntType }
-                )
+                "eventDetails/{eventId}/{userId}"
             ) { backStackEntry ->
-                val eventId = backStackEntry.arguments?.getInt("eventId")
-                val userId = backStackEntry.arguments?.getInt("userId")
-                EventDetailsScreenDesign(navController, eventId, 7)//TODO
+                val eventId = backStackEntry.arguments?.getString("eventId")
+                val userId = backStackEntry.arguments?.getString("userId")
+                EventDetailsScreenDesign(navController, eventId, userId)
             }
             composable("create_event") { CreateEventScreenDesign(navController, null) }
             composable("create_event/{clubName}")
