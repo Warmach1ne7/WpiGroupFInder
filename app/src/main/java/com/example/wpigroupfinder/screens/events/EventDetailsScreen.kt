@@ -312,7 +312,7 @@ fun unregisterForEvent(
     onResult: (String) -> Unit
 ) {
     val client = OkHttpClient()
-    val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/unregisterEvent"
+    val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/leaveEvent"
     val jsonBody = """
         {
             "event_id": $eventId,
