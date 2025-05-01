@@ -30,7 +30,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventDetailsScreenDesign(navController: NavController, eventId: Int?) {
+fun EventDetailsScreenDesign(navController: NavController, eventId: Int?, userId: Int?) {
     var event by remember { mutableStateOf<Event?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -38,12 +38,14 @@ fun EventDetailsScreenDesign(navController: NavController, eventId: Int?) {
     var registrationResult by remember { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    var alreadyRegistered by remember { mutableStateOf(false) }
 
     // Fetch event details when screen loads
     LaunchedEffect(eventId) {
         if (eventId != null) {
             try {
                 event = getEventRequest(eventId)
+                alreadyRegistered = isUserRegistered(eventId, userId!!)
                 errorMessage = null
             } catch (e: Exception) {
                 errorMessage = "Failed to load event: ${e.localizedMessage}"
@@ -118,11 +120,12 @@ fun EventDetailsScreenDesign(navController: NavController, eventId: Int?) {
                     )
                     Button(
                         onClick = { showRegisterDialog = true },
+                        enabled = !alreadyRegistered, // Disable if already registered
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 24.dp)
                     ) {
-                        Text("Register for Event")
+                        Text(if (alreadyRegistered) "Registered" else "Register for Event")
                     }
 
 
@@ -268,6 +271,31 @@ fun registerForEvent(
         }
     }
 }
+suspend fun isUserRegistered(eventId: Int, userId: Int): Boolean = withContext(Dispatchers.IO) {
+    val client = OkHttpClient()
+    val url = "https://fgehdrx5r6.execute-api.us-east-2.amazonaws.com/wpigroupfinder/checkEventRegistration"
+    val jsonBody = """
+        {
+            "eventId": $eventId,
+            "userId": $userId
+        }
+    """.trimIndent()
+    val requestBody = jsonBody.toRequestBody("application/json; charset=utf-8".toMediaType())
+    val request = Request.Builder()
+        .url(url)
+        .post(requestBody)
+        .build()
+    try {
+        val response = client.newCall(request).execute()
+        val responseBody = response.body?.string()
+        if (response.isSuccessful && responseBody != null) {
+            val json = JSONObject(responseBody)
+            return@withContext json.optBoolean("registered", false)
+        }
+    } catch (_: Exception) { }
+    return@withContext false
+}
+
 
 
 

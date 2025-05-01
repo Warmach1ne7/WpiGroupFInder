@@ -156,7 +156,7 @@ fun EventsScreenDesign(navController: NavController) {
                     LazyColumn(modifier = Modifier.weight(1f)) {
                         items(events) { event ->
                             EventListItem(event = event) {
-                                navController.navigate("eventDetails/${event.id}")
+                                navController.navigate("eventDetails/${event.id}/${7}")//TODO
                             }
                         }
                     }
@@ -166,7 +166,7 @@ fun EventsScreenDesign(navController: NavController) {
                 onClick = { navController.navigate("create_event") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(8.dp)
             ) {
                 Text("Create Event")
             }
@@ -174,7 +174,7 @@ fun EventsScreenDesign(navController: NavController) {
                 onClick = { navController.navigate("registered_events") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(8.dp)
             ) {
                 Text("Registered Events")
             }
@@ -182,7 +182,7 @@ fun EventsScreenDesign(navController: NavController) {
                 onClick = { navController.navigate("home") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(8.dp)
             ) {
                 Text("Go to Home")
             }
