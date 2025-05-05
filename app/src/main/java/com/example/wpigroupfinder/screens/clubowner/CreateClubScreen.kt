@@ -13,11 +13,20 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,13 +52,18 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateClubScreenDesign(navController: NavController, userid: String?) {
     var clubname by remember { mutableStateOf("") }
     var clubdesc by remember { mutableStateOf("") }
     val user_uidInt = userid?.toInt()
 
+    var isLoading by remember { mutableStateOf(false) }
+
     fun createClubRequest(){
+        isLoading = true
+
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
 
@@ -92,32 +106,64 @@ fun CreateClubScreenDesign(navController: NavController, userid: String?) {
             } catch (e: Exception) {
                 println("Exception: ${e.message}")
             }
+            isLoading = false
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Create Club")
-            OutlinedTextField(
-                value = clubname,
-                onValueChange = { clubname = it },
-                label = { Text("Club Name") }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Create Club") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
             )
-            OutlinedTextField(
-                value = clubdesc,
-                onValueChange = { clubdesc = it },
-                label = { Text("Club Description") }
-            )
-            Button(onClick = { createClubRequest() }){
-                Text("Create Club")
+        }
+    ) { innerPadding ->
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
-            Button(onClick = { navController.popBackStack() }){
-                Text("Back")
+
+            else -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Create Club")
+                        OutlinedTextField(
+                            value = clubname,
+                            onValueChange = { clubname = it },
+                            label = { Text("Club Name") }
+                        )
+                        OutlinedTextField(
+                            value = clubdesc,
+                            onValueChange = { clubdesc = it },
+                            label = { Text("Club Description") }
+                        )
+                        Button(onClick = { createClubRequest() }) {
+                            Text("Create Club")
+                        }
+                        Button(onClick = { navController.popBackStack() }) {
+                            Text("Back")
+                        }
+                    }
+                }
             }
         }
     }
